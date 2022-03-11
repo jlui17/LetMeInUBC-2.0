@@ -1,1 +1,1 @@
-# LetMeInUBC2
+# LetMeInUBC-2.0
