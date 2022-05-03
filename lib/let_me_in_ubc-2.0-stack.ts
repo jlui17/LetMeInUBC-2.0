@@ -1,16 +1,20 @@
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import { CourseService } from './services/CourseService';
 
 export class LetMeInUbc20Stack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
+    const coursesTable = new dynamodb.Table(this, 'Courses', {
+      partitionKey: { name: 'courseName', type: dynamodb.AttributeType.STRING },
+    });
 
-    // example resource
-    // const queue = new sqs.Queue(this, 'LetMeInUbc20Queue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
+    const courseService = new CourseService(this, 'CourseService', {
+      COURSES_TABLE_NAME: coursesTable.tableName
+    });
+
+    coursesTable.grantReadWriteData(courseService.createHandler);
   }
 }
