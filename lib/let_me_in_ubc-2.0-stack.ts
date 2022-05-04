@@ -15,6 +15,7 @@ export class LetMeInUbc20Stack extends Stack {
       COURSES_TABLE_NAME: coursesTable.tableName
     });
 
-    coursesTable.grantReadWriteData(courseService.createHandler);
+    coursesTable.grantWriteData(courseService.createHandler);
+    coursesTable.grantReadData(courseService.getHandler);
   }
 }
