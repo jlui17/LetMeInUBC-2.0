@@ -5,6 +5,7 @@ import { Construct } from 'constructs';
 export class TrackingService extends Construct {
   public readonly createHandler: lambda.Function;
   public readonly getHandler: lambda.Function;
+  public readonly deleteHandler: lambda.Function;
 
   constructor(scope: Construct, id: string, props: any) {
     super(scope, id);
@@ -27,6 +28,15 @@ export class TrackingService extends Construct {
         TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME,
         EMAIL_INDEX_NAME: props.EMAIL_INDEX_NAME
       }
-    })
+    });
+
+    this.deleteHandler = new lambda.Function(this, 'DeleteTrackingHandler', {
+      runtime: lambda.Runtime.NODEJS_14_X,
+      handler: 'DeleteTracking.handler',
+      code: RESOURCE_FOLDER,
+      environment: {
+        TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME
+      }
+    });
   }
 }

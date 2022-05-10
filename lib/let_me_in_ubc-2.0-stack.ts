@@ -29,6 +29,11 @@ export class LetMeInUbc20Stack extends Stack {
     const courseService = new CourseService(this, 'CourseService', {
       COURSES_TABLE_NAME: coursesTable.tableName
     });
+    const coursesRoute = api.root.addResource('courses');
+    coursesRoute.addMethod('POST', new apigateway.LambdaIntegration(courseService.createHandler));
+    coursesRoute.addMethod('GET', new apigateway.LambdaIntegration(courseService.getHandler));
+    coursesTable.grantWriteData(courseService.createHandler);
+    coursesTable.grantReadData(courseService.getHandler);
 
     const trackingTable = new dynamodb.Table(this, 'Tracking', {
       partitionKey: { name: 'courseName', type: dynamodb.AttributeType.STRING },
@@ -43,17 +48,12 @@ export class LetMeInUbc20Stack extends Stack {
       TRACKING_TABLE_NAME: trackingTable.tableName,
       EMAIL_INDEX_NAME: 'emailIndex'
     });
-    
-    const coursesRoute = api.root.addResource('courses');
-    coursesRoute.addMethod('POST', new apigateway.LambdaIntegration(courseService.createHandler));
-    coursesRoute.addMethod('GET', new apigateway.LambdaIntegration(courseService.getHandler));
-    coursesTable.grantWriteData(courseService.createHandler);
-    coursesTable.grantReadData(courseService.getHandler);
-
     const trackingRoute = api.root.addResource('tracking');
     trackingRoute.addMethod('POST', new apigateway.LambdaIntegration(trackingService.createHandler));
     trackingRoute.addMethod('GET', new apigateway.LambdaIntegration(trackingService.getHandler));
+    trackingRoute.addMethod('DELETE', new apigateway.LambdaIntegration(trackingService.deleteHandler));
     trackingTable.grantWriteData(trackingService.createHandler);
     trackingTable.grantReadData(trackingService.getHandler);
+    trackingTable.grantWriteData(trackingService.deleteHandler);
   }
 }
