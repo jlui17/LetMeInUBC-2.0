@@ -60,6 +60,27 @@ exports.handler = async (event: any): Promise<any> => {
         statusCode: 200,
         body: JSON.stringify(data.Items)
       };
+
+    // get all courses being tracked
+    case 'allCourses':
+      courseTrackingParams = {
+        TableName: TRACKING_TABLE_NAME,
+        ProjectionExpression: "courseName",
+      }
+      data = await db.scan(courseTrackingParams, (error: any, data: any) => {
+        if (error) return [error, error.stack];
+    
+        console.log(data);
+        return data;
+      }).promise();
+
+      const courses = data.Items?.map(course => course.courseName);
+      console.log(courses);
+    
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ courses: [...new Set(courses)] })
+      };
     
     // bad request, must specify key to query by
     default:
