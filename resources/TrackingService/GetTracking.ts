@@ -9,6 +9,8 @@ exports.handler = async (event: any): Promise<any> => {
   const { key } = event.queryStringParameters;
   let courseTrackingParams;
   let data;
+  let courses;
+  let emails;
 
   switch (key) {
     // get by course
@@ -30,10 +32,14 @@ exports.handler = async (event: any): Promise<any> => {
         console.log(data);
         return data;
       }).promise();
+
+      if (data.Items?.length == 0) return { statusCode: 404 };
+
+      emails = data.Items?.map(email => email.email);
     
       return {
         statusCode: 200,
-        body: JSON.stringify(data.Items)
+        body: JSON.stringify({ emails: emails })
       };
     
     // get by email
@@ -55,10 +61,14 @@ exports.handler = async (event: any): Promise<any> => {
         console.log(data);
         return data;
       }).promise();
+
+      if (data.Items?.length == 0) return { statusCode: 404 };
+
+      courses = data.Items?.map(course => course.courseName);
     
       return {
         statusCode: 200,
-        body: JSON.stringify(data.Items)
+        body: JSON.stringify({ courses: courses })
       };
 
     // get all courses being tracked
@@ -74,8 +84,9 @@ exports.handler = async (event: any): Promise<any> => {
         return data;
       }).promise();
 
-      const courses = data.Items?.map(course => course.courseName);
-      console.log(courses);
+      if (data.Items?.length == 0) return { statusCode: 404 };
+
+      courses = data.Items?.map(course => course.courseName);
     
       return {
         statusCode: 200,

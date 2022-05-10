@@ -32,6 +32,7 @@ Your get request must include 1 URL param, followed by mandatory context params:
   - one of:
     - "courseName"
     - "email"
+    - "allCourses"
 
 When the `key` is `"courseName"`, the request must include the following params:
 - `session`
@@ -42,6 +43,8 @@ When the `key` is `"courseName"`, the request must include the following params:
 When the `key` is `"email"`, the request must include the following params:
 - `email`
 
+When the `key` is `"allCourses"`, you don't need any additional params.
+
 It will return a JSON in the following format:
 
 `GET /tracking?key=courseName&session=W&department=COMM&number=103&section=101`
@@ -50,14 +53,12 @@ Returns
 ```
 Status Code: 200
 
-[
-  {
-    "email": "test@test.com"
-  },
-  {
-    "email": "test1@test1.com"
-  }
-]
+{
+  emails: [
+    "test@test.com",
+    "test1@test1.com"
+  ]
+}
 ```
 `GET /tracking?key=email&email=test@test.com`
 
@@ -65,14 +66,29 @@ Returns
 ```
 Status Code: 200
 
-[
-  {
-    "courseName": "W COMM 101 101"
-  },
-  {
-    "courseName": "W COMM 101 102"
-  }
-]
+{
+  courses: [
+    "W COMM 101 101",
+    "W COMM 101 102"
+  ]
+}
+```
+
+`GET /tracking?key=allCourses`
+
+Returns
+```
+Status Code: 200
+{
+  courses: [
+    "W COMM 101 105",
+    "W COMM 101 104",
+    "S COMM 101 101",
+    "W COMM 101 101",
+    "W COMM 101 103",
+    "S COMM 101 102"
+  ]
+}
 ```
 
 If course is not found in table, returns `404 response`.
