@@ -13,7 +13,7 @@ exports.handler = async (event: any): Promise<any> => {
       courseName: courseName
     },
   }
-  const data = await db.get(courseParams, (error, data) => {
+  const data = await db.get(courseParams, (error: any, data: any) => {
     if (error) return [error, error.stack];
 
     console.log(data);

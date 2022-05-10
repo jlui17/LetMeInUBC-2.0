@@ -1,6 +1,5 @@
 import * as cdk from 'aws-cdk-lib';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import { Construct } from 'constructs';
 
 export class CourseService extends Construct {
@@ -27,25 +26,6 @@ export class CourseService extends Construct {
       environment: {
         COURSES_TABLE_NAME: props.COURSES_TABLE_NAME
       }
-    })
-
-    const api = new apigateway.RestApi(this, 'CoursesAPI', {
-      defaultCorsPreflightOptions: {
-        allowHeaders: [
-          'Content-Type',
-          'X-Amz-Date',
-          'Authorization',
-          'X-Api-Key',
-        ],
-        allowMethods: ['GET', 'POST', 'DELETE'],
-        allowCredentials: true,
-        allowOrigins: ['*'],
-      },
     });
-
-    const coursesRoute = api.root.addResource('courses');
-
-    coursesRoute.addMethod('POST', new apigateway.LambdaIntegration(this.createHandler));
-    coursesRoute.addMethod('GET', new apigateway.LambdaIntegration(this.getHandler));
   }
 }
