@@ -34,8 +34,14 @@ export class LetMeInUbc20Stack extends Stack {
       partitionKey: { name: 'courseName', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'email', type: dynamodb.AttributeType.STRING }
     });
+    trackingTable.addGlobalSecondaryIndex({
+      indexName: 'emailIndex',
+      partitionKey: { name: 'email', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'courseName', type: dynamodb.AttributeType.STRING },
+    });
     const trackingService = new TrackingService(this, 'TrackingService', {
-      TRACKING_TABLE_NAME: trackingTable.tableName
+      TRACKING_TABLE_NAME: trackingTable.tableName,
+      EMAIL_INDEX_NAME: 'emailIndex'
     });
     
     const coursesRoute = api.root.addResource('courses');
@@ -46,6 +52,8 @@ export class LetMeInUbc20Stack extends Stack {
 
     const trackingRoute = api.root.addResource('tracking');
     trackingRoute.addMethod('POST', new apigateway.LambdaIntegration(trackingService.createHandler));
+    trackingRoute.addMethod('GET', new apigateway.LambdaIntegration(trackingService.getHandler));
     trackingTable.grantWriteData(trackingService.createHandler);
+    trackingTable.grantReadData(trackingService.getHandler);
   }
 }
