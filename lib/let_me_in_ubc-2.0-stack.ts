@@ -4,6 +4,9 @@ import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import { Construct } from 'constructs';
 import { CourseService } from './services/CourseService';
 import { TrackingService } from './services/TrackingService';
+import { WebService } from './services/WebService';
+
+const CURRENT_SCHOOL_YEAR = 2021;
 
 export class LetMeInUbc20Stack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -55,5 +58,9 @@ export class LetMeInUbc20Stack extends Stack {
     trackingTable.grantWriteData(trackingService.createHandler);
     trackingTable.grantReadData(trackingService.getHandler);
     trackingTable.grantWriteData(trackingService.deleteHandler);
+
+    const webService = new WebService(this, 'WebService', {
+      CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR
+    });
   }
 }
