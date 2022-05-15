@@ -4,7 +4,7 @@ import random
 import requests
 from bs4 import BeautifulSoup
 
-CURRENT_SCHOOL_YEAR = os.environ.get("CURRENT_SCHOOL_YEAR") 
+CURRENT_SCHOOL_YEAR = int(os.environ['CURRENT_SCHOOL_YEAR'])
 SECTION_URL_TEMPLATE = "https://courses.students.ubc.ca/cs/courseschedule?" \
                        "sesscd={}&pname=subjarea&tname=subj-section&sessyr={}&dept={}&course={}&section={}"
 
@@ -116,6 +116,8 @@ def get_seat_summary(section_data):
 
 
 def get_available_sections(sections):
+    if not sections:
+        return
     sections_to_refresh = sections
 
     available_sections = []
@@ -154,14 +156,8 @@ def get_available_sections(sections):
     return available_sections
 
 
-def notify(contacts):
-    for contact in contacts:
-        # Send email
-        continue
-
-
 def handler(event, context):
-    result = get_available_sections(event.body.sections)
+    result = get_available_sections(event.get('sections'))
     return {
         'statusCode': 200,
         'body': json.dumps(result)

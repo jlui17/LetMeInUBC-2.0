@@ -5,8 +5,10 @@ import { Construct } from 'constructs';
 import { CourseService } from './services/CourseService';
 import { TrackingService } from './services/TrackingService';
 import { WebService } from './services/WebService';
+import { NotifyService } from './services/NotifyService';
+import { RefreshAndNotify } from './services/RefreshAndNotify';
 
-const CURRENT_SCHOOL_YEAR = 2021;
+const CURRENT_SCHOOL_YEAR = '2021';
 
 export class LetMeInUbc20Stack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -62,5 +64,15 @@ export class LetMeInUbc20Stack extends Stack {
     const webService = new WebService(this, 'WebService', {
       CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR
     });
+
+    const notifyService = new NotifyService(this, 'NotifyService', {
+      CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR
+    })
+
+    const refreshAndNotifyService = new RefreshAndNotify(this, 'RefreshAndNotifyService', {
+      GET_AVAILABLE_COURSES: webService.handler,
+      NOTIFY_CONTACTS: notifyService.handler,
+      GET_COURSES: courseService.getHandler
+    })
   }
 }
