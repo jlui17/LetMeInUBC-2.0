@@ -23,6 +23,7 @@
     "@aws-cdk/aws-lambda-python-alpha": "^2.24.1-alpha.0",
     "aws-cdk-lib": "^2.21.1",
     "aws-sdk": "^2.1126.0",
+    "cdk-spa-deploy": "^2.0.0-alpha.1",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.16"
   }
