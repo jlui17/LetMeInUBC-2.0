@@ -19,7 +19,7 @@ import { CourseService } from "./services/CourseService";
 import { TrackingService } from "./services/TrackingService";
 import { WebService } from "./services/WebService";
 import { NotifyService } from "./services/NotifyService";
-// import { RefreshAndNotify } from "./services/RefreshAndNotify";
+import { RefreshAndNotifyService } from "./services/RefreshAndNotifyService";
 
 const CURRENT_SCHOOL_YEAR = "2021";
 
@@ -151,15 +151,13 @@ export class LetMeInUbc20Stack extends Stack {
       CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR,
     });
 
-    // const refreshAndNotifyService = new RefreshAndNotify(
-    //   this,
-    //   "RefreshAndNotifyService",
-    //   {
-    //     GET_AVAILABLE_COURSES: webService.handler,
-    //     NOTIFY_CONTACTS: notifyService.handler,
-    //     GET_COURSES: courseService.getHandler,
-    //   }
-    // );
+    const refreshAndNotifyService = new RefreshAndNotifyService(this, "RefreshAndNotifyService",
+      {
+        GET_AVAILABLE_COURSES: webService.handler.functionName,
+        NOTIFY_CONTACTS: notifyService.handler.functionName,
+        GET_TRACKING: trackingService.getHandler.functionName,
+      }
+    );
 
     //Create SPA - Cloudfront-SPA for in-built https support, deploy first to get URL
     const spa_app = new SPADeploy(this, "spaDeploy").createSiteWithCloudfront({

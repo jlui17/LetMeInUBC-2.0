@@ -15,6 +15,7 @@ export class WebService extends Construct {
       index: 'GetAvailableCourses.py',
       handler: 'handler',
       entry: RESOURCE_FOLDER,
+      timeout: cdk.Duration.minutes(5),
       environment: {
         'CURRENT_SCHOOL_YEAR': props.CURRENT_SCHOOL_YEAR
       },
