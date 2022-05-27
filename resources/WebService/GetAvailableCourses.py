@@ -10,38 +10,38 @@ SECTION_URL_TEMPLATE = "https://courses.students.ubc.ca/cs/courseschedule?" \
 
 MOCK_DATA = [
     {
-        'is_winter': False,
-        'dept': 'COMM',
+        'session': 'S',
+        'department': 'COMM',
         'number': '390',
         'section': '971'
     },
     {
-        'is_winter': False,
-        'dept': 'INVALID',
+        'session': 'S',
+        'department': 'INVALID',
         'number': '305A',
         'section': '921'
     },
     {
-        'is_winter': False,
-        'dept': 'PSYC',
+        'session': 'S',
+        'department': 'PSYC',
         'number': '305A',
         'section': '921'
     },
     {
-        'is_winter': False,
-        'dept': 'CPSC',
+        'session': 'S',
+        'department': 'CPSC',
         'number': '103',
         'section': '9W1'
     },
     {
-        'is_winter': False,
-        'dept': 'CPSC',
+        'session': 'S',
+        'department': 'CPSC',
         'number': '103',
         'section': 'V01'
     },
     {
-        'is_winter': True,
-        'dept': 'CLST',
+        'session': 'W',
+        'department': 'CLST',
         'number': '301',
         'section': 'T05'
     }
@@ -78,9 +78,9 @@ def get_random_ua():
 
 def get_section_string(section_data, template="{} {} {} {} {}"):
     return template.format(
-        'W' if section_data['is_winter'] else 'S',
-        CURRENT_SCHOOL_YEAR + (0 if section_data['is_winter'] else 1),
-        section_data['dept'],
+        section_data['session'],
+        CURRENT_SCHOOL_YEAR + (0 if section_data['session'] == 'W' else 1),
+        section_data['department'],
         section_data['number'],
         section_data['section']
     )
@@ -153,11 +153,24 @@ def get_available_sections(sections):
         # print(":: get_available_sections: Invalid section(s): " + str(invalid_sections))
         pass
 
-    return available_sections
+    return { 
+        'availableCourses': available_sections,
+        'invalidCourses': invalid_sections
+    }
+
+
+def format_section(section_string):
+    arr = section_string.split()
+    return {
+        'session': arr[0],
+        'department': arr[1],
+        'number': arr[2],
+        'section': arr[3] 
+    }
 
 
 def handler(event, context):
-    result = get_available_sections(event.get('sections'))
+    result = get_available_sections(map(format_section, event.get('sections')))
     return {
         'statusCode': 200,
         'body': json.dumps(result)

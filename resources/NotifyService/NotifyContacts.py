@@ -1,36 +1,44 @@
 import os
 
+SECTION_URL_TEMPLATE = "https://courses.students.ubc.ca/cs/courseschedule?" \
+                       "sesscd={}&pname=subjarea&tname=subj-section&sessyr={}&dept={}&course={}&section={}"
+EMAIL_CONTENT = "There is a spot available for {}! Grab it quick before it's gone!\n{}"
+notified = []
 
-def notify_by_email(emails):
+
+def notify_by_email(emails, course_name, course_link):
+    msg = EMAIL_CONTENT.format(course_name, course_link)
     for email in emails:
         # Send email
-        print(email)
+        print(msg)
         continue
 
 def get_section_string(section_data, template="{} {} {} {} {}"):
     return template.format(
-        'W' if section_data['is_winter'] else 'S',
-        os.environ['CURRENT_SCHOOL_YEAR'] + (0 if section_data['is_winter'] else 1),
-        section_data['dept'],
+        section_data['session'],
+        int(os.environ['CURRENT_SCHOOL_YEAR']) + (0 if section_data['session'] == 'W' else 1),
+        section_data['department'],
         section_data['number'],
         section_data['section']
     )
 
-def get_emails_for_section(section_data):
-    # Query contacts for section with restricted? = section_data['restricted_only']
-    # Return as array of emails
-    return
+def notify(to_notify):
+    for notify_dict in to_notify:
+        section = notify_dict['course']
+        emails = notify_dict['emails']
 
-def notify(sections):
-
-    for section in sections:
+        course_name = get_section_string(section)
+        course_link = get_section_string(section, SECTION_URL_TEMPLATE)
         if not section['restricted_only']:
-            print("\tBegin notifying all contacts for '{}'...".format(get_section_string(section)))
+            print("\tBegin notifying all contacts for '{}'...".format(course_name))
         else:
-            print("\tBegin notifying restricted-seat contacts for '{}'...".format(get_section_string(section)))
+            print("\tBegin notifying restricted-seat contacts for '{}'...".format(course_name))
 
-        emails = get_emails_for_section(section)
-        notify_by_email(emails)
+        notify_by_email(emails, course_name, course_link)
 
 def handler(event, context):
-    notify(event['sections'])
+    notify(event['data'])
+    return {
+        'statusCode': 200,
+        'body': event['data']
+    }
