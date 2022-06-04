@@ -57,7 +57,8 @@ export class LetMeInUbc20Stack extends Stack {
         ],
         allowMethods: ["GET", "POST", "DELETE"],
         allowCredentials: true,
-        allowOrigins: ["https://dxi81lck7ldij.cloudfront.net"],
+        //"https://dxi81lck7ldij.cloudfront.net"
+        allowOrigins: ["*"],
       },
 
       deployOptions: {
@@ -117,7 +118,7 @@ export class LetMeInUbc20Stack extends Stack {
     const trackingRoute = api.root.addResource("tracking");
     trackingRoute.addMethod(
       "POST",
-      new apigateway.LambdaIntegration(trackingService.createHandler),
+      new apigateway.LambdaIntegration(trackingService.createEndpointHandler),
       {
         authorizer,
         authorizationType: AuthorizationType.COGNITO,
@@ -125,23 +126,25 @@ export class LetMeInUbc20Stack extends Stack {
     );
     trackingRoute.addMethod(
       "GET",
-      new apigateway.LambdaIntegration(trackingService.getHandler),
-      {
-        authorizer,
-        authorizationType: AuthorizationType.COGNITO,
-      }
+      new apigateway.LambdaIntegration(trackingService.getEndpointHandler),
+      // {
+      //   authorizer,
+      //   authorizationType: AuthorizationType.COGNITO,
+      // }
     );
     trackingRoute.addMethod(
       "DELETE",
-      new apigateway.LambdaIntegration(trackingService.deleteHandler),
+      new apigateway.LambdaIntegration(trackingService.deleteEndpointHandler),
       {
         authorizer,
         authorizationType: AuthorizationType.COGNITO,
       }
     );
-    trackingTable.grantWriteData(trackingService.createHandler);
-    trackingTable.grantReadData(trackingService.getHandler);
-    trackingTable.grantWriteData(trackingService.deleteHandler);
+    trackingTable.grantWriteData(trackingService.createEndpointHandler);
+    trackingTable.grantReadData(trackingService.getByEmailHandler);
+    trackingTable.grantReadData(trackingService.getByCourseHandler);
+    trackingTable.grantReadData(trackingService.getByAllCoursesHandler);
+    trackingTable.grantWriteData(trackingService.deleteEndpointHandler);
 
     const webService = new WebService(this, "WebService", {
       CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR,
@@ -155,7 +158,7 @@ export class LetMeInUbc20Stack extends Stack {
       {
         GET_AVAILABLE_COURSES: webService.handler.functionName,
         NOTIFY_CONTACTS: notifyService.handler.functionName,
-        GET_TRACKING: trackingService.getHandler.functionName,
+        GET_TRACKING: trackingService.getByAllCoursesHandler.functionName,
       }
     );
 
