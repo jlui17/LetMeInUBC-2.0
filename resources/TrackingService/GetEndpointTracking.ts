@@ -1,5 +1,21 @@
 import { Lambda } from 'aws-sdk';
 
+const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest) => {
+  const invokeLambda = (params: Lambda.InvocationRequest) => {
+    const lambda = new Lambda();
+
+    return lambda.invoke(params).promise();
+  };
+
+  const getDataFromLambdaResponse = (response: any) => {
+    return response.Payload;
+  }
+
+  const response = await invokeLambda(params);
+
+  return getDataFromLambdaResponse(response);
+};
+
 interface courseParams {
   department: string,
   section: string,
@@ -9,16 +25,6 @@ interface courseParams {
 
 interface emailParams {
   email: string,
-}
-
-const invokeLambda = (params: Lambda.InvocationRequest) => {
-  const lambda = new Lambda();
-
-  return lambda.invoke(params).promise();
-};
-
-const getDataFromLambdaResponse = (response: any) => {
-  return response.Payload;
 }
 
 exports.handler = async (event: any): Promise<any> => {
@@ -43,8 +49,7 @@ exports.handler = async (event: any): Promise<any> => {
         Payload: Buffer.from(JSON.stringify(courseParams)),
       }
 
-      const lambdaResponse = await invokeLambda(invokeParams);
-      const emails = getDataFromLambdaResponse(lambdaResponse);
+      const emails = await invokeLambdaAndGetData(invokeParams);
 
       return {
         statusCode: 200,
