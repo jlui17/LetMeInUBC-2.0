@@ -65,6 +65,25 @@ exports.handler = async (event: any): Promise<any> => {
     case 'email':
       const { email } = event.queryStringParameters;
 
+      const emailParams = { email: email };
+
+      invokeParams = {
+        FunctionName: process.env.getByEmailFunctionName ? process.env.getByEmailFunctionName : "",
+        Payload: Buffer.from(JSON.stringify(emailParams)),
+      }
+
+      const courses: string[] = await invokeLambdaAndGetData(invokeParams);
+
+      if (courses.length === 0) 
+        return {
+          statusCode: 404
+        };
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify(courses),
+      };
+
     // get all courses being tracked
     case 'allCourses':
     
