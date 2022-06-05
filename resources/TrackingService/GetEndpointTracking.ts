@@ -86,6 +86,22 @@ exports.handler = async (event: any): Promise<any> => {
 
     // get all courses being tracked
     case 'allCourses':
+
+    invokeParams = {
+      FunctionName: process.env.getByAllCoursesFunctionName ? process.env.getByAllCoursesFunctionName : ""
+    }
+
+    const allCourses: string[] = await invokeLambdaAndGetData(invokeParams);
+
+    if (allCourses.length === 0) 
+      return {
+        statusCode: 404
+      };
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(allCourses),
+    };
     
     // bad request, must specify key to query by
     default:
