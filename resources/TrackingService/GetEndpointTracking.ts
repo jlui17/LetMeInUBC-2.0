@@ -13,7 +13,7 @@ const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest) => {
 
   const response = await invokeLambda(params);
 
-  return getDataFromLambdaResponse(response);
+  return JSON.parse(getDataFromLambdaResponse(response));
 };
 
 interface courseParams {
@@ -49,7 +49,12 @@ exports.handler = async (event: any): Promise<any> => {
         Payload: Buffer.from(JSON.stringify(courseParams)),
       }
 
-      const emails = await invokeLambdaAndGetData(invokeParams);
+      const emails: string[] = await invokeLambdaAndGetData(invokeParams);
+
+      if (emails.length === 0) 
+        return {
+          statusCode: 404
+        };
 
       return {
         statusCode: 200,
