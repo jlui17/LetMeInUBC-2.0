@@ -1,14 +1,14 @@
 import { Lambda } from 'aws-sdk';
 
-const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest) => {
+const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest): Promise<string[]> => {
   const invokeLambda = (params: Lambda.InvocationRequest) => {
     const lambda = new Lambda();
 
     return lambda.invoke(params).promise();
   };
 
-  const getDataFromLambdaResponse = (response: any) => {
-    return response.Payload;
+  const getDataFromLambdaResponse = (response: Lambda.InvocationResponse): string => {
+    return response.Payload ? response.Payload?.toString() : "";
   }
 
   const response = await invokeLambda(params);
@@ -27,7 +27,12 @@ interface emailParams {
   email: string,
 }
 
-exports.handler = async (event: any): Promise<any> => {
+interface endpointResponse {
+  statusCode: number, 
+  body?: string,
+}
+
+exports.handler = async (event: any): Promise<endpointResponse> => {
   const { key } = event.queryStringParameters;
 
   let invokeParams: Lambda.InvocationRequest;
@@ -65,7 +70,7 @@ exports.handler = async (event: any): Promise<any> => {
     case 'email':
       const { email } = event.queryStringParameters;
 
-      const emailParams = { email: email };
+      const emailParams: emailParams = { email: email };
 
       invokeParams = {
         FunctionName: process.env.getByEmailFunctionName ? process.env.getByEmailFunctionName : "",
