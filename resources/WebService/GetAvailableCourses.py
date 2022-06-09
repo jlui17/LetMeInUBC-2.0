@@ -96,14 +96,19 @@ def get_section_soup(section_data):
 
 def get_seat_summary(section_data):
     soup = get_section_soup(section_data)
+    title = soup.find('h4')
+    description = soup.find('h5')
 
-    if "no longer offered" in soup.text:
+    if "no longer offered" in soup.text or not title or not description:
         raise InvalidSectionError("Section does not exist")
     
     if "Out of Service" in soup.find('div', attrs={'class': 'content expand'}).text:
         raise OutOfServiceException()
 
-    seat_summary = {}
+    seat_summary = {
+        'title': title.text,
+        'description': description.text
+    }
     for x in soup.find('table', attrs={'class': '\'table'}).contents:
         try:
             # Set first word of each row as dict key
@@ -128,7 +133,8 @@ def get_available_sections(sections):
     for section in sections_to_refresh:
         try:
             seat_summary = get_seat_summary(section)
-
+            section['title'] = seat_summary['title']
+            section['description'] = seat_summary['description']
             # print("\t{}:\t".format(get_section_string(section)) + str(seat_summary))
 
             if seat_summary['General'] > 0:
@@ -170,8 +176,4 @@ def format_section(section_string):
 
 
 def handler(event, context):
-    result = get_available_sections(map(format_section, event.get('sections')))
-    return {
-        'statusCode': 200,
-        'body': json.dumps(result)
-    }
+    return get_available_sections(map(format_section, event.get('sections')))

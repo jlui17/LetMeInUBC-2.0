@@ -20,6 +20,7 @@ import { TrackingService } from "./services/TrackingService";
 import { WebService } from "./services/WebService";
 import { NotifyService } from "./services/NotifyService";
 import { RefreshAndNotifyService } from "./services/RefreshAndNotifyService";
+import * as iam from 'aws-cdk-lib/aws-iam';
 
 const CURRENT_SCHOOL_YEAR = "2021";
 
@@ -153,14 +154,32 @@ export class LetMeInUbc20Stack extends Stack {
     const notifyService = new NotifyService(this, "NotifyService", {
       CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR,
     });
+    notifyService.handler.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['ses:SendEmail', 'SES:SendRawEmail'],
+      resources: ['*'],
+      effect: iam.Effect.ALLOW,
+    }));
 
     const refreshAndNotifyService = new RefreshAndNotifyService(this, "RefreshAndNotifyService",
       {
         GET_AVAILABLE_COURSES: webService.handler.functionName,
         NOTIFY_CONTACTS: notifyService.handler.functionName,
-        GET_TRACKING: trackingService.getByAllCoursesHandler.functionName,
+        GET_ALL_COURSES: trackingService.getByAllCoursesHandler.functionName,
+        GET_EMAILS: trackingService.getByCourseHandler.functionName,
       }
     );
+
+    const refreshAndNotifyPolicy = new iam.PolicyStatement({
+      actions: ['lambda:*'],
+      resources: ['arn:aws:lambda:us-west-2:*'],
+    });
+    refreshAndNotifyService.handler.role?.attachInlinePolicy(
+      new iam.Policy(this, 'refresh-and-notify-policy', {
+        statements: [refreshAndNotifyPolicy],
+      }),
+    );
+    trackingService.getByAllCoursesHandler.grantInvoke(refreshAndNotifyService.handler);
+    trackingService.getByCourseHandler.grantInvoke(refreshAndNotifyService.handler);
 
     //Create SPA - Cloudfront-SPA for in-built https support, deploy first to get URL
     const spa_app = new SPADeploy(this, "spaDeploy").createSiteWithCloudfront({

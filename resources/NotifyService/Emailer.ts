@@ -1,0 +1,60 @@
+const CURRENT_SCHOOL_YEAR: string = process.env.CURRENT_SCHOOL_YEAR || "";
+const SECTION_URL_TEMPLATE = "https://courses.students.ubc.ca/cs/courseschedule?sesscd={}&pname=subjarea&tname=subj-section&sessyr={}&dept={}&course={}&section={}"
+const EMAIL_CONTENT = "There is a spot available for {}! Grab it quick before it's gone!\n{}"
+const notified = []
+
+const aws = require("aws-sdk");
+const ses = new aws.SES({ region: "us-west-2" });
+
+const getCourseName = function (courseDict: any) {
+    const { session, department, number, section } = courseDict;
+    return `${session} ${department} ${number} ${section}`;
+}
+
+const getCourseURL = function (courseDict: any) {
+    const { session, department, number, section } = courseDict;
+    const year = parseInt(CURRENT_SCHOOL_YEAR) + (session == 'W' ? 0 : 1)
+    return `https://courses.students.ubc.ca/cs/courseschedule?sesscd=${session}&pname=subjarea&tname=subj-section&sessyr=${year}&dept=${department}&course=${number}&section=${section}`
+}
+
+const sendEmail = async function (emails: Array<string>, title: string, description:string, courseURL: string, restricted: boolean) {
+    var params = {
+        Destination: {
+        ToAddresses: emails,
+        },
+        Message: {
+        Body: {
+            Text: { Data: `There is a ${restricted ? `restricted ` : ``}seat available for ${title} - ${description}\n\n${courseURL}` },
+        },
+
+        Subject: { Data: `Let Me In UBC: A seat has opened up for ${title}` },
+        },
+        Source: "letmeinubc@gmail.com",
+    };
+    
+    return ses.sendEmail(params).promise()
+}
+
+interface courseDict {
+    title: string,
+    description: string,
+    session: string,
+    department: string,
+    number: string,
+    section: string,
+    restricted_only: boolean
+}
+
+exports.handler = async function (event: any) {
+    const toNotify = event.data;
+    for (let notifyDict of toNotify) {
+        const emails: Array<string> = notifyDict["emails"];
+        const courseDict: courseDict = notifyDict["course"];
+
+        // const courseName: string = getCourseName(notifyDict["course"]);
+        const courseURL: string = getCourseURL(notifyDict["course"]);
+
+        await sendEmail(emails, courseDict['title'], courseDict['description'], courseURL, courseDict['restricted_only']);
+    }
+    return event.data
+};
