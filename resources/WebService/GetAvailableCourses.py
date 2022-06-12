@@ -1,4 +1,3 @@
-import json
 import os
 import random
 import requests
@@ -56,6 +55,10 @@ class OutOfServiceException(Exception):
     pass
 
 
+class MissingAttributeException(Exception):
+    pass
+
+
 # From https://www.jcchouinard.com/random-user-agent-with-python-and-beautifulsoup/
 def get_random_ua():
     ua_strings = [
@@ -99,11 +102,14 @@ def get_seat_summary(section_data):
     title = soup.find('h4')
     description = soup.find('h5')
 
-    if "no longer offered" in soup.text or not title or not description:
+    if "no longer offered" in soup.text:
         raise InvalidSectionError("Section does not exist")
     
     if "Out of Service" in soup.find('div', attrs={'class': 'content expand'}).text:
         raise OutOfServiceException()
+    
+    if not title or not description:
+        raise MissingAttributeException(soup.text)
 
     seat_summary = {
         'title': title.text,
@@ -128,14 +134,14 @@ def get_available_sections(sections):
     available_sections = []
     invalid_sections = []
 
-    # print(":: get_available_sections: Seat summaries")
+    print(":: get_available_sections: Seat summaries")
 
     for section in sections_to_refresh:
         try:
             seat_summary = get_seat_summary(section)
             section['title'] = seat_summary['title']
             section['description'] = seat_summary['description']
-            # print("\t{}:\t".format(get_section_string(section)) + str(seat_summary))
+            print("\t{}:\t".format(get_section_string(section)) + str(seat_summary))
 
             if seat_summary['General'] > 0:
                 section['restricted_only'] = False
@@ -146,17 +152,21 @@ def get_available_sections(sections):
 
         except InvalidSectionError as e:
             invalid_sections.append({
-                'data': section,
+                'course': section,
                 'reason': e.args[0]
             })
         except OutOfServiceException:
+            pass
+        except MissingAttributeException as e:
+            print(":: Unable to get info for " + get_section_string(section) + ", dumping soup...")
+            print(str(e))
             pass
         except requests.exceptions.RequestException as e:
             # print(e)
             pass
 
     if invalid_sections:
-        # print(":: get_available_sections: Invalid section(s): " + str(invalid_sections))
+        print(":: get_available_sections: Invalid section(s): " + str(invalid_sections))
         pass
 
     return { 

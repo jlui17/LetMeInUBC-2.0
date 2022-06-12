@@ -1,9 +1,5 @@
 const CURRENT_SCHOOL_YEAR: string = process.env.CURRENT_SCHOOL_YEAR || "";
-const SECTION_URL_TEMPLATE = "https://courses.students.ubc.ca/cs/courseschedule?sesscd={}&pname=subjarea&tname=subj-section&sessyr={}&dept={}&course={}&section={}"
-const EMAIL_CONTENT = "There is a spot available for {}! Grab it quick before it's gone!\n{}"
-const notified = []
-
-const aws = require("aws-sdk");
+import aws = require("aws-sdk");
 const ses = new aws.SES({ region: "us-west-2" });
 
 const getCourseName = function (courseDict: any) {
@@ -53,7 +49,7 @@ exports.handler = async function (event: any) {
 
         // const courseName: string = getCourseName(notifyDict["course"]);
         const courseURL: string = getCourseURL(notifyDict["course"]);
-
+        
         await sendEmail(emails, courseDict['title'], courseDict['description'], courseURL, courseDict['restricted_only']);
     }
     return event.data

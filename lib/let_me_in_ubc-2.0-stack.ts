@@ -1,5 +1,5 @@
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
-import { Stack, StackProps } from 'aws-cdk-lib';
+import { Duration, Stack, StackProps } from 'aws-cdk-lib';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import {
   AuthorizationType,
@@ -21,6 +21,8 @@ import { WebService } from "./services/WebService";
 import { NotifyService } from "./services/NotifyService";
 import { RefreshAndNotifyService } from "./services/RefreshAndNotifyService";
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as events from 'aws-cdk-lib/aws-events'
+import * as targets from 'aws-cdk-lib/aws-events-targets'
 
 const CURRENT_SCHOOL_YEAR = "2021";
 
@@ -162,10 +164,11 @@ export class LetMeInUbc20Stack extends Stack {
 
     const refreshAndNotifyService = new RefreshAndNotifyService(this, "RefreshAndNotifyService",
       {
-        GET_AVAILABLE_COURSES: webService.handler.functionName,
+        GET_AVAILABLE_COURSES: webService.getAvailableCoursesHandler.functionName,
         NOTIFY_CONTACTS: notifyService.handler.functionName,
         GET_ALL_COURSES: trackingService.getByAllCoursesHandler.functionName,
         GET_EMAILS: trackingService.getByCourseHandler.functionName,
+        DELETE_TRACKING: trackingService.deleteEndpointHandler.functionName,
       }
     );
 
@@ -178,8 +181,13 @@ export class LetMeInUbc20Stack extends Stack {
         statements: [refreshAndNotifyPolicy],
       }),
     );
+    const eventRule = new events.Rule(this, 'scheduleRule', {
+      schedule: events.Schedule.rate(Duration.minutes(5)),
+    })
     trackingService.getByAllCoursesHandler.grantInvoke(refreshAndNotifyService.handler);
     trackingService.getByCourseHandler.grantInvoke(refreshAndNotifyService.handler);
+    trackingService.deleteEndpointHandler.grantInvoke(refreshAndNotifyService.handler);
+    eventRule.addTarget(new targets.LambdaFunction(refreshAndNotifyService.handler));
 
     //Create SPA - Cloudfront-SPA for in-built https support, deploy first to get URL
     const spa_app = new SPADeploy(this, "spaDeploy").createSiteWithCloudfront({

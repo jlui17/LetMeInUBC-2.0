@@ -21,6 +21,7 @@ export class RefreshAndNotifyService extends Construct {
         GET_EMAILS: props.GET_EMAILS,
         GET_AVAILABLE_COURSES: props.GET_AVAILABLE_COURSES,
         NOTIFY_CONTACTS: props.NOTIFY_CONTACTS,
+        DELETE_TRACKING: props.DELETE_TRACKING,
       }
     });
   }
