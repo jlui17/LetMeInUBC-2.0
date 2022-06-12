@@ -8,6 +8,15 @@ const DELETE_TRACKING: string = process.env.DELETE_TRACKING || "";
 const lambda = new Lambda();
 let params;
 let data;
+interface CourseEntry {
+  session: string,
+  department: string,
+  number: string,
+  section: string,
+  title?: string,
+  description?: string,
+  email?: string,
+}
 
 exports.handler = async (event: any): Promise<any> => {
     params = {
@@ -21,31 +30,31 @@ exports.handler = async (event: any): Promise<any> => {
     params = {
       FunctionName: GET_AVAILABLE_COURSES,
       InvocationType: "RequestResponse",
-      Payload: Buffer.from(JSON.stringify({
+      Payload: JSON.stringify({
         sections: allCourses,
-      })),
+      }),
       LogType: "Tail",
     };
     data = await lambda.invoke(params).promise();
     data = JSON.parse(data.Payload as string);
-    const availableCourses: Array<string> = data["availableCourses"];
-    const invalidCourses = data["invalidCourses"];
+    const availableCourses: Array<CourseEntry> = data["availableCourses"];
+    const invalidCourses: Array<{ course: CourseEntry, reason: string }> = data["invalidCourses"];
     console.log(":: Available Courses: " + JSON.stringify(availableCourses));
     console.log(":: Invalid Courses: " + JSON.stringify(invalidCourses));
 
-    const notifyArr = [];
+    const notifyArr: Array<{course: CourseEntry, emails: Array<string>}> = [];
     for (let course of availableCourses) {
       params = {
         FunctionName: GET_EMAILS,
         InvocationType: "RequestResponse",
-        Payload: Buffer.from(JSON.stringify(course)),
+        Payload: JSON.stringify(course),
         LogType: "Tail",
       };
       data = await lambda.invoke(params).promise();
       const emails = JSON.parse(data.Payload as string);
       notifyArr.push({
         course: course,
-        emails: emails,
+        emails,
       });
     }
 
@@ -53,23 +62,27 @@ exports.handler = async (event: any): Promise<any> => {
     params = {
       FunctionName: NOTIFY_CONTACTS,
       InvocationType: "RequestResponse",
-      Payload: Buffer.from(JSON.stringify({
+      Payload: JSON.stringify({
         data: notifyArr
-      })),
+      }),
       LogType: "Tail",
     };
     data = await lambda.invoke(params).promise();
 
-    console.log(":: Remove Tracking")
+    console.log(":: Remove Tracking");
     for (let entry of notifyArr) {
-      params = {
-        FunctionName: DELETE_TRACKING,
-        InvocationType: "RequestResponse",
-        Payload: Buffer.from(JSON.stringify(entry)),
-        LogType: "Tail",
-      };
-      console.log(":: Tracking removed:" + JSON.stringify(entry))
-      data = await lambda.invoke(params).promise();
+      for (let email of entry['emails']) {
+        const queryParams = entry['course'];
+        queryParams['email'] = email;
+        params = {
+          FunctionName: DELETE_TRACKING,
+          InvocationType: "RequestResponse",
+          Payload: JSON.stringify(queryParams),
+          LogType: "Tail",
+        };
+        console.log(":: Tracking removed:" + JSON.stringify(queryParams));
+        data = await lambda.invoke(params).promise();
+      }
     }
 
     // invalid course handling
@@ -77,26 +90,21 @@ exports.handler = async (event: any): Promise<any> => {
       params = {
         FunctionName: GET_EMAILS,
         InvocationType: "RequestResponse",
-        Payload: Buffer.from(JSON.stringify(invalidDict['course'])),
+        Payload: JSON.stringify(invalidDict['course']),
         LogType: "Tail",
       };
       data = await lambda.invoke(params).promise();
       const emails = JSON.parse(data.Payload as string);
       for (let email of emails) {
+        const queryParams = invalidDict['course']
+        queryParams['email'] = email
         params = {
           FunctionName: DELETE_TRACKING,
           InvocationType: "RequestResponse",
-          Payload: Buffer.from(JSON.stringify({
-            email: email,
-            course: invalidDict['course'],
-          })),
+          Payload: JSON.stringify(queryParams),
           LogType: "Tail",
         };
-        console.log(":: Invalid tracking removed:" +
-        JSON.stringify({
-          email: email,
-          data: invalidDict,
-        }))
+        console.log(":: Invalid tracking removed:" + JSON.stringify(queryParams))
         data = await lambda.invoke(params).promise();
       }
     }
