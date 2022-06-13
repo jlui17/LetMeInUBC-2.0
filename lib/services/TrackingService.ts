@@ -4,6 +4,7 @@ import { Construct } from 'constructs';
 
 export class TrackingService extends Construct {
   public readonly createEndpointHandler: lambda.Function;
+  public readonly createHandler: lambda.Function;
   public readonly deleteEndpointHandler: lambda.Function
   public readonly getEndpointHandler: lambda.Function;
   public readonly getByEmailHandler: lambda.Function;
@@ -42,12 +43,21 @@ export class TrackingService extends Construct {
       }
     });
 
+    this.createHandler = new lambda.Function(this, 'CreateTrackingHandler', {
+      runtime: lambda.Runtime.NODEJS_14_X,
+      handler: 'CreateTracking.handler',
+      code: RESOURCE_FOLDER,
+      environment: {
+        TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME
+      }
+    });
+
     this.createEndpointHandler = new lambda.Function(this, 'CreateEndpointTrackingHandler', {
       runtime: lambda.Runtime.NODEJS_14_X,
       handler: 'CreateEndpointTracking.handler',
       code: RESOURCE_FOLDER,
       environment: {
-        TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME
+        createTrackingFunctionName: this.createHandler.functionName
       }
     });
 
@@ -71,6 +81,7 @@ export class TrackingService extends Construct {
       }
     });
 
+    this.createHandler.grantInvoke(this.createEndpointHandler);
     this.getByAllCoursesHandler.grantInvoke(this.getEndpointHandler);
     this.getByCourseHandler.grantInvoke(this.getEndpointHandler);
     this.getByEmailHandler.grantInvoke(this.getEndpointHandler);

@@ -1,4 +1,5 @@
 import { Lambda } from 'aws-sdk';
+import { bool } from 'aws-sdk/clients/signer';
 
 const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest): Promise<string[]> => {
   const invokeLambda = (params: Lambda.InvocationRequest) => {
@@ -40,13 +41,13 @@ exports.handler = async (event: any): Promise<endpointResponse> => {
   switch (key) {
     // get by course
     case 'courseName':
-      const { department, section, number, session } = event.queryStringParameters;
+      const { department, section, number, session, restricted } = event.queryStringParameters;
 
       const courseParams: courseParams = {
         department: department,
         section: section,
         number: number,
-        session: session
+        session: session,
       }
 
       invokeParams = {

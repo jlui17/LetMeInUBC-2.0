@@ -143,7 +143,7 @@ export class LetMeInUbc20Stack extends Stack {
         authorizationType: AuthorizationType.COGNITO,
       }
     );
-    trackingTable.grantWriteData(trackingService.createEndpointHandler);
+    trackingTable.grantWriteData(trackingService.createHandler);
     trackingTable.grantReadData(trackingService.getByEmailHandler);
     trackingTable.grantReadData(trackingService.getByCourseHandler);
     trackingTable.grantReadData(trackingService.getByAllCoursesHandler);

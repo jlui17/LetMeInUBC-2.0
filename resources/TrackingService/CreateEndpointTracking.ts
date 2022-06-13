@@ -1,22 +1,51 @@
-import { DynamoDB } from 'aws-sdk';
+import { Lambda } from 'aws-sdk';
 
-const TRACKING_TABLE_NAME: string = process.env.TRACKING_TABLE_NAME ? process.env.TRACKING_TABLE_NAME : "";
+const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest): Promise<string> => {
+    const invokeLambda = (params: Lambda.InvocationRequest) => {
+        const lambda = new Lambda();
+
+        return lambda.invoke(params).promise();
+    };
+
+    const getDataFromLambdaResponse = (response: Lambda.InvocationResponse): string => {
+        return response.Payload ? response.Payload?.toString() : "";
+    }
+
+    const response = await invokeLambda(params);
+
+    return JSON.parse(getDataFromLambdaResponse(response));
+};
+
+interface courseParams {
+  department: string,
+  section: string,
+  number: string,
+  session: string,
+  email: string,
+  restricted: string,
+}
 
 exports.handler = async (event: any): Promise<any> => {
-  const db = new DynamoDB.DocumentClient();
-  const { department, section, number, session, email } = JSON.parse(event.body);
-  const courseName = `${session} ${department} ${number} ${section}`
+  const { department, section, number, session, email, restricted } = JSON.parse(event.body);
 
-  await db.put({
-    TableName: TRACKING_TABLE_NAME,
-    Item: {
-      courseName: courseName,
-      email: email
-    },
-  }).promise();
+  const courseParams: courseParams = {
+    department: department,
+    section: section,
+    number: number,
+    session: session,
+    email: email,
+    restricted: restricted,
+  }
+
+  const invokeParams = {
+    FunctionName: process.env.createTrackingFunctionName ? process.env.createTrackingFunctionName : "",
+    Payload: Buffer.from(JSON.stringify(courseParams)),
+  }
+
+  const response: string = await invokeLambdaAndGetData(invokeParams);
 
   return {
     statusCode: 200,
-    body: JSON.stringify(`${email} is now tracking ${courseName}!`)
+    body: response
   }
 }
