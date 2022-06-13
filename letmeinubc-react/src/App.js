@@ -3,37 +3,75 @@ import ReactDOM from "react-dom";
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
+
+
 function App() {
   const [open, setOpen] = useState(false);
 
-   const courses = [
-     { department: "CPSC", number: "340", section: "001" },
-     { department: "CPSC", number: "340", section: "001" },
-     { department: "CPSC", number: "340", section: "001" },
-     { department: "CPSC", number: "340", section: "001" },
-     { department: "CPSC", number: "340", section: "001" },
-     { department: "CPSC", number: "340", section: "001" },
-     { department: "CPSC", number: "340", section: "001" },
-     { department: "CPSC", number: "340", section: "001" },
-     { department: "CPSC", number: "340", section: "001" },
-     { department: "CPSC", number: "340", section: "001" },
-     { department: "CPSC", number: "340", section: "001" },
-     { department: "CPSC", number: "340", section: "001" },
-     { department: "CPSC", number: "340", section: "001" },
-     { department: "CPSC", number: "340", section: "001" },
-   ];
-  
-   const coursesList = courses.map((course) => (
-     <li className="text-lg font-medium font-sans text-gray-700 hover:outline hover:outline-1 py-2 my-2 mx-2 rounded-lg">
-       <input class="form-check-input appearance-none mx-4 h-5 w-5 border rounded-md border-ubc-grey bg-white checked:bg-ubc-blue focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="checkbox" value="" id="delete"/>
-      <label class="form-check-label inline-block text-gray-800" for="delete">
-         <span className="p-4">{course.department}</span>
-         <span className="p-4">{course.number}</span>
-         <span className="p-4">{course.section}</span>
-      </label>
-     </li>
-   ));
+  const courses = [
+    { department: "CPSC", number: "340", section: "001", restricted: false },
+    { department: "CPSC", number: "340", section: "001", restricted: false },
+    { department: "CPSC", number: "340", section: "001", restricted: false },
+    { department: "CPSC", number: "340", section: "001", restricted: false },
+    { department: "CPSC", number: "340", section: "001", restricted: false },
+    { department: "CPSC", number: "340", section: "001", restricted: false },
+    { department: "CPSC", number: "340", section: "001", restricted: false },
+    { department: "CPSC", number: "340", section: "001", restricted: false },
+    { department: "CPSC", number: "340", section: "001", restricted: false },
+    { department: "CPSC", number: "340", section: "001", restricted: false },
+    { department: "CPSC", number: "340", section: "001", restricted: false },
+    { department: "CPSC", number: "340", section: "001", restricted: false },
+    { department: "CPSC", number: "340", section: "001", restricted: false },
+    { department: "CPSC", number: "340", section: "001", restricted: true },
+  ];
 
+  const coursesList = courses.map((course) => (
+    <li className="text-lg font-medium font-sans text-gray-700 hover:outline hover:outline-1 py-2 my-2 mx-2 rounded-lg">
+      <input
+        class="form-check-input appearance-none mx-4 h-5 w-5 border rounded-md border-ubc-grey bg-white checked:bg-ubc-blue focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer"
+        type="checkbox"
+        value=""
+        id="delete"
+      />
+      <label class="form-check-label inline-block text-gray-800" for="delete">
+        <span className="p-4">{course.department}</span>
+        <span className="p-4">{course.number}</span>
+        <span className="p-4">{course.section}</span>
+        <span className="p-4">
+          {course.restricted ? "Restricted + General" : "General Only"}
+        </span>
+      </label>
+    </li>
+  ));
+
+  let token;
+  try {
+    token = window.location.href.split("=")[1].split("&"[0])[0];
+  } catch (e) {
+    return <div>You are not signed in</div>;
+  }
+
+  const recordTracking = async (token) => {
+    const response = await fetch(
+      "https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/",
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Authorization: token,
+        },
+        body: JSON.stringify({
+          session: "W",
+          department: "COMM",
+          number: 104,
+          section: 101,
+          email: "bob@test.com",
+        }),
+      }
+    );
+    const result = await response.json();
+    return 200;
+  };
 
   return (
     <>
@@ -64,7 +102,7 @@ function App() {
               >
                 <Dialog.Panel className="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full">
                   <div className="mt-5 md:mt-0 md:col-span-2">
-                    <form action="#" method="POST">
+                    <form>
                       <div className="shadow overflow-hidden sm:rounded-md">
                         <div className="px-4 py-5 bg-white sm:p-6">
                           <div className="grid grid-cols-6 gap-6">
@@ -131,8 +169,27 @@ function App() {
                               <option>Summer</option>
                             </select>
                           </div>
+                          <div className="col-span-6 sm:col-span-3 py-2">
+                            <label
+                              htmlFor="session"
+                              className="h-10 pl-1block text-lg font-medium text-gray-700"
+                            >
+                              General Seats Only
+                            </label>
+                            <input
+                              class="form-check-input appearance-none h-5 w-5 border rounded-md border-ubc-grey bg-white checked:bg-ubc-blue focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer"
+                              type="checkbox"
+                              name="restricted"
+                              id="restricted"
+                            />
+                          </div>
                           <div className="px-4 py-3 mt-4 bg-ubc-grey-50 text-right sm:px-6">
-                            <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500">
+                            <button
+                              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
+                              onClick={async () => {
+                                let res = await recordTracking(token);
+                              }}
+                            >
                               Submit
                             </button>
                           </div>
@@ -169,9 +226,7 @@ function App() {
                 </div>
 
                 <div className="px-4 py-3 mt-4 bg-ubc-grey-50 text-right sm:px-6">
-                  <button
-                    className="inline-flex justify-center py-2 px-4 mr-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
-                  >
+                  <button className="inline-flex justify-center py-2 px-4 mr-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500">
                     Delete
                   </button>
                   <button
