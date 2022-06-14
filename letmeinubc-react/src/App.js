@@ -62,9 +62,10 @@ function App() {
         body: JSON.stringify({
           session: "W",
           department: "COMM",
-          number: 104,
-          section: 101,
+          number: "104",
+          section: "101",
           email: "bob@test.com",
+          restricted: "true",
         }),
       }
     );
