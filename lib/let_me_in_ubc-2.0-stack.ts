@@ -95,6 +95,14 @@ export class LetMeInUbc20Stack extends Stack {
       //   authorizationType: AuthorizationType.COGNITO,
       // }
     );
+    coursesRoute.addMethod(
+      "POST",
+      new apigateway.LambdaIntegration(courseService.getEndpointHandler),
+      {
+        authorizer,
+        authorizationType: AuthorizationType.COGNITO,
+      }
+    );
     coursesTable.grantWriteData(courseService.createHandler);
     coursesTable.grantReadData(courseService.getEndpointHandler);
 
