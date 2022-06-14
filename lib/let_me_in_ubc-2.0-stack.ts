@@ -121,10 +121,10 @@ export class LetMeInUbc20Stack extends Stack {
     trackingRoute.addMethod(
       "POST",
       new apigateway.LambdaIntegration(trackingService.createEndpointHandler),
-      {
-        authorizer,
-        authorizationType: AuthorizationType.COGNITO,
-      }
+      // {
+      //   authorizer,
+      //   authorizationType: AuthorizationType.COGNITO,
+      // }
     );
     trackingRoute.addMethod(
       "GET",
