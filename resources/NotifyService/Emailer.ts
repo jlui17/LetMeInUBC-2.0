@@ -1,6 +1,8 @@
 const CURRENT_SCHOOL_YEAR: string = process.env.CURRENT_SCHOOL_YEAR || "";
 import aws = require("aws-sdk");
-const ses = new aws.SES({ region: "us-west-2" });
+import nodemailer = require("nodemailer");
+
+// const ses = new aws.SES({ region: "us-west-2" });
 
 const getCourseName = function (courseDict: any) {
     const { session, department, number, section } = courseDict;
@@ -14,21 +16,41 @@ const getCourseURL = function (courseDict: any) {
 }
 
 const sendEmail = async function (emails: Array<string>, title: string, description:string, courseURL: string, restricted: boolean) {
-    var params = {
-        Destination: {
-        ToAddresses: emails,
-        },
-        Message: {
-        Body: {
-            Text: { Data: `There is a ${restricted ? `restricted ` : ``}seat available for ${title} - ${description}\n\n${courseURL}` },
-        },
+    // const params = {
+    //     Destination: {
+    //     ToAddresses: emails,
+    //     },
+    //     Message: {
+    //     Body: {
+    //         Text: { Data: `There is a ${restricted ? `restricted ` : ``}seat available for ${title} - ${description}\n\n${courseURL}` },
+    //     },
 
-        Subject: { Data: `Let Me In UBC: A seat has opened up for ${title}` },
-        },
-        Source: "letmeinubc@gmail.com",
-    };
+    //     Subject: { Data: `Let Me In UBC: A seat has opened up for ${title}` },
+    //     },
+    //     Source: "letmeinubc@gmail.com",
+    // };
     
-    return ses.sendEmail(params).promise()
+    // return ses.sendEmail(params).promise()
+    const transporter = nodemailer.createTransport(
+        {
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAILER_USER,
+                pass: process.env.EMAILER_PASS,
+            }
+    });
+
+    var mailOptions = {
+        from: 'letmeinubc@gmail.com',
+        to: emails.join(", "),
+        subject: `Let Me In UBC: A seat has opened up for ${title}`,
+        text: `There is a ${restricted ? `restricted ` : ``}seat available for ${title} - ${description}\n\n${courseURL}`
+    };
+
+    const response = await transporter.sendMail(mailOptions);
+    console.log(response);
+
+    return response;
 }
 
 interface courseDict {
