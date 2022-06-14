@@ -40,9 +40,16 @@ exports.handler = async (event: any): Promise<any> => {
     Payload: Buffer.from(JSON.stringify(getCourseParams)),
   }
 
-  const getCourseResponse: boolean = await invokeLambdaAndGetData(getCourseInvokeParams);
+  const getCourseResponse: {
+    department?: string,
+    section?: string,
+    number?: string,
+    session?: string,
+    title?: string,
+    description?: string,
+  } = await invokeLambdaAndGetData(getCourseInvokeParams);
 
-  if (!getCourseResponse) {
+  if (Object.keys(getCourseResponse).length === 0) {
     const getCourseDataParams: {
       department: string,
       section: string,

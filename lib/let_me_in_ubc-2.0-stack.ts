@@ -80,11 +80,10 @@ export class LetMeInUbc20Stack extends Stack {
     );
 
     const coursesTable = new dynamodb.Table(this, "Courses", {
-      partitionKey: { name: "session", type: dynamodb.AttributeType.STRING },
-      sortKey: { name: "department", type: dynamodb.AttributeType.STRING },
+      partitionKey: { name: "courseName", type: dynamodb.AttributeType.STRING },
     });
     const courseService = new CourseService(this, "CourseService", {
-      COURSES_TABLE_NAME: coursesTable.tableName,
+      COURSES_TABLE_NAME: coursesTable.tableName
     });
     const coursesRoute = api.root.addResource("courses");
     coursesRoute.addMethod(
@@ -104,7 +103,7 @@ export class LetMeInUbc20Stack extends Stack {
       }
     );
     coursesTable.grantWriteData(courseService.createHandler);
-    coursesTable.grantReadData(courseService.getEndpointHandler);
+    coursesTable.grantReadData(courseService.getHandler);
 
     const webService = new WebService(this, "WebService", {
       CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR,

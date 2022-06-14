@@ -14,6 +14,7 @@ interface courseParams {
 exports.handler = async (event: courseParams): Promise<string> => {
     const db = new DynamoDB.DocumentClient();
     const { department, section, number, session, title, description } = event;
+    const courseName = `${session} ${department} ${number} ${section}`
 
     await db.put({
         TableName: COURSES_TABLE_NAME,
@@ -24,6 +25,7 @@ exports.handler = async (event: courseParams): Promise<string> => {
             section: section,
             title: title,
             description: description,
+            courseName: courseName,
         },
     }).promise();
 
