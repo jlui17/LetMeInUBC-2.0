@@ -154,7 +154,7 @@ export class LetMeInUbc20Stack extends Stack {
     trackingTable.grantReadData(trackingService.getByEmailHandler);
     trackingTable.grantReadData(trackingService.getByCourseHandler);
     trackingTable.grantReadData(trackingService.getByAllCoursesHandler);
-    trackingTable.grantWriteData(trackingService.deleteEndpointHandler);
+    trackingTable.grantWriteData(trackingService.deleteHandler);
 
     const webService = new WebService(this, "WebService", {
       CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR,
