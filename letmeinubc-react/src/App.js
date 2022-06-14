@@ -3,8 +3,6 @@ import ReactDOM from "react-dom";
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
-
-
 function App() {
   const [open, setOpen] = useState(false);
 
@@ -44,16 +42,17 @@ function App() {
     </li>
   ));
 
-  // let token;
-  // try {
-  //   token = window.location.href.split("=")[1].split("&"[0])[0];
-  // } catch (e) {
-  //   return <div>You are not signed in</div>;
-  // }
+  let token;
+  try {
+    token = window.location.href.split("=")[1].split("&"[0])[0];
+  } catch (e) {
+    return <div>You are not signed in</div>;
+  }
 
   const recordTracking = async (token) => {
+    console.log("submit pressed");
     const response = await fetch(
-      "https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/",
+      "https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/tracking",
       {
         method: "POST",
         headers: {
@@ -69,7 +68,9 @@ function App() {
         }),
       }
     );
+    console.log(response);
     const result = await response.json();
+    console.log(result);
     return 200;
   };
 
@@ -186,9 +187,9 @@ function App() {
                           <div className="px-4 py-3 mt-4 bg-ubc-grey-50 text-right sm:px-6">
                             <button
                               className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
-                              // onClick={async () => {
-                              //   let res = await recordTracking(token);
-                              // }}
+                              onClick={async () => {
+                                let res = await recordTracking(token);
+                              }}
                             >
                               Submit
                             </button>

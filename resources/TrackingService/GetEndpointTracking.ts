@@ -22,6 +22,7 @@ interface courseParams {
   section: string,
   number: string,
   session: string,
+  restricted: string,
 }
 
 interface emailParams {
@@ -48,6 +49,7 @@ exports.handler = async (event: any): Promise<endpointResponse> => {
         section: section,
         number: number,
         session: session,
+        restricted: restricted,
       }
 
       invokeParams = {

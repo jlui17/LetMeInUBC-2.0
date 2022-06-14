@@ -30,7 +30,8 @@ export class TrackingService extends Construct {
       handler: 'GetTrackingByCourse.handler',
       code: RESOURCE_FOLDER,
       environment: {
-        TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME
+        TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME,
+        COURSE_INDEX_NAME: props.COURSE_INDEX_NAME,
       }
     });
 
