@@ -23,33 +23,33 @@ const GET_COURSE_DATA_FUNCTION_NAME = process.env.GET_COURSE_DATA_FUNCTION_NAME 
 exports.handler = async (event: any): Promise<any> => {
   const { department, section, number, session, email, restricted } = JSON.parse(event.body);
 
-  const getCourseParams: {
+  const getCourseParams: [{
     department: string,
     section: string,
     number: string,
     session: string
-  } = {
+  }] = [{
     department: department,
     section: section,
     number: number,
     session: session
-  }
+  }]
 
   const getCourseInvokeParams = {
     FunctionName: GET_COURSE_FUNCTION_NAME,
     Payload: Buffer.from(JSON.stringify(getCourseParams)),
   }
 
-  const getCourseResponse: {
-    department?: string,
-    section?: string,
-    number?: string,
-    session?: string,
-    title?: string,
-    description?: string,
-  } = await invokeLambdaAndGetData(getCourseInvokeParams);
+  const getCourseResponse: [{
+    department: string,
+    section: string,
+    number: string,
+    session: string,
+    title: string,
+    description: string,
+  }?] = await invokeLambdaAndGetData(getCourseInvokeParams);
 
-  if (Object.keys(getCourseResponse).length === 0) {
+  if (getCourseResponse.length === 0) {
     const getCourseDataParams: {
       department: string,
       section: string,

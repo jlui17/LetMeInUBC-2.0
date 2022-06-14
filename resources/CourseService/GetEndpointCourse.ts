@@ -1,11 +1,9 @@
 import { Lambda } from 'aws-sdk';
+import { AttributeMap } from 'aws-sdk/clients/dynamodb';
 
 const GET_COURSE_FUNCTION_NAME: string = process.env.GET_COURSE_FUNCTION_NAME ? process.env.GET_COURSE_FUNCTION_NAME : "";
 
-const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest): Promise<{
-  title?: string,
-  description?: string,
-}> => {
+const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest): Promise<AttributeMap[]> => {
   const invokeLambda = (params: Lambda.InvocationRequest) => {
     const lambda = new Lambda();
 
@@ -22,46 +20,31 @@ const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest): Promise
 };
 
 exports.handler = async (event: any): Promise<any> => {
-  const { department, section, number, session } = event.queryStringParameters;
+  const courseNames: { 
+    department: string, 
+    section: string, 
+    number: string, 
+    session: string }[] = JSON.parse(event.body);
 
-  const getCourseParams: {
-    department: string,
-    section: string,
-    number: string,
-    session: string
-  } = {
-    department: department,
-    section: section,
-    number: number,
-    session: session
-  }
+  const getCourseParams: string[] = courseNames.map((course) => {
+    const { session, department, number, section } = course;
+    return `${session} ${department} ${number} ${section}`;
+  });
 
   const getCourseInvokeParams = {
     FunctionName: GET_COURSE_FUNCTION_NAME,
     Payload: Buffer.from(JSON.stringify(getCourseParams)),
   }
 
-  const getCourseResponse: {
-    title?: string,
-    description?: string,
-  } = await invokeLambdaAndGetData(getCourseInvokeParams);
+  const getCourseResponse = await invokeLambdaAndGetData(getCourseInvokeParams);
 
   // if course not found in table
-  if (Object.keys(getCourseResponse).length === 0) return {
+  if (getCourseResponse.length === 0) return {
     statusCode: 404
-  }
-
-  const response = {
-    department: department,
-    section: section,
-    number: number,
-    session: session,
-    title: getCourseResponse.title,
-    description: getCourseResponse.description,
   }
 
   return {
     statusCode: 200,
-    body: JSON.stringify(response)
+    body: JSON.stringify(getCourseResponse)
   };
 }

@@ -1,34 +1,32 @@
 import { DynamoDB } from 'aws-sdk';
+import { AttributeMap } from 'aws-sdk/clients/dynamodb';
 
 const COURSES_TABLE_NAME: string = process.env.COURSES_TABLE_NAME ? process.env.COURSES_TABLE_NAME : "";
 
-exports.handler = async (event: {
-    department: string,
-    section: string,
-    number: string,
-    session: string,
-}): Promise<any> => {
+exports.handler = async (event: string[] ): Promise<AttributeMap[]> => {
     const db = new DynamoDB.DocumentClient();
-    const { department, section, number, session } = event;
-    const courseName: string = `${session} ${department} ${number} ${section}`
+    const courseNames = event;
 
-    const courseParams = {
-        TableName: COURSES_TABLE_NAME,
-        Key: {
-            courseName: courseName
-        },
-        AttributesToGet: ["title", "description"],
-    };
+    const courses: AttributeMap[] = [];
 
-    const data = await db.get(courseParams, (error: any, data: any) => {
-        if (error) return [error, error.stack];
+    for (let i = 0; i < courseNames.length; i++) {
+        const courseParams = {
+            TableName: COURSES_TABLE_NAME,
+            Key: {
+                courseName: courseNames[i]
+            },
+            AttributesToGet: ["session", "department", "number", "section", "title", "description"],
+        };
+    
+        const data = await db.get(courseParams, (error: any, data: any) => {
+            if (error) return [error, error.stack];
+    
+            console.log(data);
+            return data;
+        }).promise();
 
-        console.log(data);
-        return data;
-    }).promise();
+        if (data.Item) courses.push(data.Item);
+    }
 
-    // if course not found in table
-    if (!data.Item) {};
-
-    return data.Item;
+    return courses;
 }
