@@ -3,6 +3,9 @@
 *.d.ts
 node_modules
 
+!postcss.config.js
+!tailwind.config.js
+
 # CDK asset staging directory
 .cdk.staging
 cdk.out
