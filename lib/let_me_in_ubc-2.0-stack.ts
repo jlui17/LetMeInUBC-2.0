@@ -90,10 +90,10 @@ export class LetMeInUbc20Stack extends Stack {
     coursesRoute.addMethod(
       "GET",
       new apigateway.LambdaIntegration(courseService.getEndpointHandler),
-      {
-        authorizer,
-        authorizationType: AuthorizationType.COGNITO,
-      }
+      // {
+      //   authorizer,
+      //   authorizationType: AuthorizationType.COGNITO,
+      // }
     );
     coursesTable.grantWriteData(courseService.createHandler);
     coursesTable.grantReadData(courseService.getEndpointHandler);
@@ -137,10 +137,10 @@ export class LetMeInUbc20Stack extends Stack {
     trackingRoute.addMethod(
       "DELETE",
       new apigateway.LambdaIntegration(trackingService.deleteEndpointHandler),
-      {
-        authorizer,
-        authorizationType: AuthorizationType.COGNITO,
-      }
+      // {
+      //   authorizer,
+      //   authorizationType: AuthorizationType.COGNITO,
+      // }
     );
     trackingTable.grantWriteData(trackingService.createHandler);
     trackingTable.grantReadData(trackingService.getByEmailHandler);
