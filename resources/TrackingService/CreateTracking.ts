@@ -21,7 +21,7 @@ exports.handler = async (event: createTrackingParams): Promise<any> => {
         Item: {
             courseName: courseName,
             email: email,
-            includeRestrictedSeats: restricted === 'true',
+            includeRestrictedSeats: restricted,
         },
     }).promise();
 

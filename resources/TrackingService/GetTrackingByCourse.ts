@@ -8,7 +8,7 @@ interface GetTrackingByCourseParams {
     section: string,
     number: string,
     session: string,
-    restricted: boolean,
+    restricted: string,
 }
 
 exports.handler = async (event: GetTrackingByCourseParams): Promise<any> => {
