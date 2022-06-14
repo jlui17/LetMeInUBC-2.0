@@ -106,6 +106,10 @@ export class LetMeInUbc20Stack extends Stack {
     coursesTable.grantWriteData(courseService.createHandler);
     coursesTable.grantReadData(courseService.getEndpointHandler);
 
+    const webService = new WebService(this, "WebService", {
+      CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR,
+    });
+
     const trackingTable = new dynamodb.Table(this, "Tracking", {
       partitionKey: { name: "courseName", type: dynamodb.AttributeType.STRING },
       sortKey: { name: "email", type: dynamodb.AttributeType.STRING },
@@ -123,7 +127,9 @@ export class LetMeInUbc20Stack extends Stack {
     const trackingService = new TrackingService(this, "TrackingService", {
       TRACKING_TABLE_NAME: trackingTable.tableName,
       EMAIL_INDEX_NAME: "emailIndex",
-      COURSE_INDEX_NAME: "courseIndex"
+      COURSE_INDEX_NAME: "courseIndex",
+      GET_COURSE_FUNCTION_NAME: courseService.getEndpointHandler.functionName,
+      GET_COURSE_DATA_FUNCTION_NAME: webService.getCourseDataHandler.functionName,
     });
     const trackingRoute = api.root.addResource("tracking");
     trackingRoute.addMethod(
@@ -156,9 +162,8 @@ export class LetMeInUbc20Stack extends Stack {
     trackingTable.grantReadData(trackingService.getByAllCoursesHandler);
     trackingTable.grantWriteData(trackingService.deleteHandler);
 
-    const webService = new WebService(this, "WebService", {
-      CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR,
-    });
+    courseService.getEndpointHandler.grantInvoke(trackingService.createEndpointHandler);
+    webService.getCourseDataHandler.grantInvoke(trackingService.createEndpointHandler);
 
     const notifyService = new NotifyService(this, "NotifyService", {
       CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR,

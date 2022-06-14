@@ -1,34 +1,92 @@
 import { Lambda } from 'aws-sdk';
 
-const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest): Promise<string> => {
-    const invokeLambda = (params: Lambda.InvocationRequest) => {
-        const lambda = new Lambda();
+const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest): Promise<any> => {
+  const invokeLambda = (params: Lambda.InvocationRequest) => {
+      const lambda = new Lambda();
 
-        return lambda.invoke(params).promise();
-    };
+      return lambda.invoke(params).promise();
+  };
 
-    const getDataFromLambdaResponse = (response: Lambda.InvocationResponse): string => {
-        return response.Payload ? response.Payload?.toString() : "";
-    }
+  const getDataFromLambdaResponse = (response: Lambda.InvocationResponse): string => {
+      return response.Payload ? response.Payload?.toString() : "";
+  }
 
-    const response = await invokeLambda(params);
+  const response = await invokeLambda(params);
 
-    return JSON.parse(getDataFromLambdaResponse(response));
+  return JSON.parse(getDataFromLambdaResponse(response));
 };
 
-interface courseParams {
-  department: string,
-  section: string,
-  number: string,
-  session: string,
-  email: string,
-  restricted: string,
-}
+const CREATE_TRACKING_FUNCTION_NAME = process.env.CREATE_TRACKING_FUNCTION_NAME ? process.env.CREATE_TRACKING_FUNCTION_NAME : "";
+const GET_COURSE_FUNCTION_NAME = process.env.GET_COURSE_FUNCTION_NAME ? process.env.GET_COURSE_FUNCTION_NAME : "";
+const GET_COURSE_DATA_FUNCTION_NAME = process.env.GET_COURSE_DATA_FUNCTION_NAME ? process.env.GET_COURSE_DATA_FUNCTION_NAME : "";
 
 exports.handler = async (event: any): Promise<any> => {
   const { department, section, number, session, email, restricted } = JSON.parse(event.body);
 
-  const courseParams: courseParams = {
+  const getCourseParams: {
+    department: string,
+    section: string,
+    number: string,
+    session: string
+  } = {
+    department: department,
+    section: section,
+    number: number,
+    session: session
+  }
+
+  const getCourseInvokeParams = {
+    FunctionName: GET_COURSE_FUNCTION_NAME,
+    Payload: Buffer.from(JSON.stringify(getCourseParams)),
+  }
+
+  const getCourseResponse: boolean = await invokeLambdaAndGetData(getCourseInvokeParams);
+
+  if (!getCourseResponse) {
+    const getCourseDataParams: {
+      department: string,
+      section: string,
+      number: string,
+      session: string
+    } = {
+      department: department,
+      section: section,
+      number: number,
+      session: session
+    }
+  
+    const getCourseDataInvokeParams = {
+      FunctionName: GET_COURSE_DATA_FUNCTION_NAME,
+      Payload: Buffer.from(JSON.stringify(getCourseDataParams)),
+    }
+
+    const getCourseDataResponse: {
+      department?: string,
+      section?: string,
+      number?: string,
+      session?: string,
+      title?: string,
+      description?: string,
+      error?: string,
+    } = await invokeLambdaAndGetData(getCourseDataInvokeParams);
+
+    if (getCourseDataResponse.error) {
+      return {
+        statusCode: 404,
+        headers: {'Access-Control-Allow-Origin': 'https://dxi81lck7ldij.cloudfront.net'},
+        body: getCourseDataResponse.error
+      }
+    }
+  }
+
+  const createTrackingParams: {
+    department: string,
+    section: string,
+    number: string,
+    session: string,
+    email: string,
+    restricted: string,
+  } = {
     department: department,
     section: section,
     number: number,
@@ -37,16 +95,16 @@ exports.handler = async (event: any): Promise<any> => {
     restricted: restricted,
   }
 
-  const invokeParams = {
-    FunctionName: process.env.createTrackingFunctionName ? process.env.createTrackingFunctionName : "",
-    Payload: Buffer.from(JSON.stringify(courseParams)),
+  const createTrackingInvokeParams = {
+    FunctionName: CREATE_TRACKING_FUNCTION_NAME,
+    Payload: Buffer.from(JSON.stringify(createTrackingParams)),
   }
 
-  const response: string = await invokeLambdaAndGetData(invokeParams);
+  const createTrackingResponse: string = await invokeLambdaAndGetData(createTrackingInvokeParams);
 
   return {
     statusCode: 201,
     headers: {'Access-Control-Allow-Origin': 'https://dxi81lck7ldij.cloudfront.net'},
-    body: response
+    body: createTrackingResponse
   }
 }
