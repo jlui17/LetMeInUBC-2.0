@@ -80,30 +80,23 @@ export class LetMeInUbc20Stack extends Stack {
     );
 
     const coursesTable = new dynamodb.Table(this, "Courses", {
-      partitionKey: { name: "courseName", type: dynamodb.AttributeType.STRING },
+      partitionKey: { name: "session", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "department", type: dynamodb.AttributeType.STRING },
     });
     const courseService = new CourseService(this, "CourseService", {
       COURSES_TABLE_NAME: coursesTable.tableName,
     });
     const coursesRoute = api.root.addResource("courses");
     coursesRoute.addMethod(
-      "POST",
-      new apigateway.LambdaIntegration(courseService.createHandler),
-      {
-        authorizer,
-        authorizationType: AuthorizationType.COGNITO,
-      }
-    );
-    coursesRoute.addMethod(
       "GET",
-      new apigateway.LambdaIntegration(courseService.getHandler),
+      new apigateway.LambdaIntegration(courseService.getEndpointHandler),
       {
         authorizer,
         authorizationType: AuthorizationType.COGNITO,
       }
     );
     coursesTable.grantWriteData(courseService.createHandler);
-    coursesTable.grantReadData(courseService.getHandler);
+    coursesTable.grantReadData(courseService.getEndpointHandler);
 
     const trackingTable = new dynamodb.Table(this, "Tracking", {
       partitionKey: { name: "courseName", type: dynamodb.AttributeType.STRING },

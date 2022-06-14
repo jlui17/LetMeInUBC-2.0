@@ -4,7 +4,7 @@ import { Construct } from 'constructs';
 
 export class CourseService extends Construct {
   public readonly createHandler: lambda.Function;
-  public readonly getHandler: lambda.Function;
+  public readonly getEndpointHandler: lambda.Function;
 
   constructor(scope: Construct, id: string, props: any) {
     super(scope, id);
@@ -19,7 +19,7 @@ export class CourseService extends Construct {
       }
     });
 
-    this.getHandler = new lambda.Function(this, 'GetCourseHandler', {
+    this.getEndpointHandler = new lambda.Function(this, 'GetCourseEndpointHandler', {
       runtime: lambda.Runtime.NODEJS_14_X,
       handler: 'GetCourse.handler',
       code: RESOURCE_FOLDER,
