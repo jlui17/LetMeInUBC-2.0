@@ -179,7 +179,7 @@ export class LetMeInUbc20Stack extends Stack {
         NOTIFY_CONTACTS: notifyService.handler.functionName,
         GET_ALL_COURSES: trackingService.getByAllCoursesHandler.functionName,
         GET_EMAILS: trackingService.getByCourseHandler.functionName,
-        DELETE_TRACKING: trackingService.deleteEndpointHandler.functionName,
+        DELETE_TRACKING: trackingService.deleteHandler.functionName,
       }
     );
 

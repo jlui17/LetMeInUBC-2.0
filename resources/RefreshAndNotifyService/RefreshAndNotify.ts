@@ -20,19 +20,21 @@ interface CourseEntry {
 }
 
 exports.handler = async (event: any): Promise<any> => {
+    // get all tracking then get available courses from it
     params = {
         FunctionName: GET_ALL_COURSES,
         InvocationType: "RequestResponse",
         LogType: "Tail",
     };
     response = await lambda.invoke(params).promise();
-    const allCourses = JSON.parse(response.Payload as string);
+    const allCourses: string[] = JSON.parse(response.Payload as string);
+    const uniqueCourses: string[] = [...new Set(allCourses)]  // temporary fix for now, this should be handled by the Lambda
 
     params = {
       FunctionName: GET_AVAILABLE_COURSES,
       InvocationType: "RequestResponse",
       Payload: JSON.stringify({
-        sections: allCourses,
+        sections: uniqueCourses,
       }),
       LogType: "Tail",
     };
@@ -59,6 +61,7 @@ exports.handler = async (event: any): Promise<any> => {
       });
     }
 
+    // notify then remove tracking
     console.log(":: Notify Contacts: " + JSON.stringify(notifyArr))
     params = {
       FunctionName: NOTIFY_CONTACTS,
@@ -88,18 +91,20 @@ exports.handler = async (event: any): Promise<any> => {
 
     // invalid course handling
     for (let invalidDict of invalidCourses) {
+      const queryParams = invalidDict['course'];
+      queryParams['restricted'] = 'false';
       params = {
         FunctionName: GET_EMAILS,
         InvocationType: "RequestResponse",
-        Payload: JSON.stringify(invalidDict['course']),
+        Payload: JSON.stringify(queryParams),
         LogType: "Tail",
       };
       response = await lambda.invoke(params).promise();
+
       const emails = JSON.parse(response.Payload as string);
       for (let email of emails) {
         const queryParams = invalidDict['course'];
         queryParams['email'] = email;
-        queryParams['restricted'] = "false";
         params = {
           FunctionName: DELETE_TRACKING,
           InvocationType: "RequestResponse",

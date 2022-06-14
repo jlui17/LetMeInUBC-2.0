@@ -144,10 +144,10 @@ def get_available_sections(sections):
             print("\t{}:\t".format(get_section_string(section)) + str(seat_summary))
 
             if seat_summary['General'] > 0:
-                section['restricted'] = False
+                section['restricted'] = 'false'
                 available_sections.append(section)
             elif seat_summary['Restricted'] > 0:
-                section['restricted'] = True
+                section['restricted'] = 'true'
                 available_sections.append(section)
 
         except InvalidSectionError as e:
