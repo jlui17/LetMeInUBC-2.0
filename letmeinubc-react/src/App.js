@@ -42,15 +42,22 @@ function App() {
     </li>
   ));
 
-  let token;
+  let tokenLogin;
   try {
-    token = window.location.href.split("=")[1].split("&"[0])[0];
+    tokenLogin = window.location.href.split('=')[1].split('&'[0])[0];
   } catch (e) {
     return <div>You are not signed in</div>;
   }
 
-  const recordTracking = async (token) => {
+
+  const recordTracking = async (info) => {
     console.log("submit pressed");
+    const token = window.location.href.slice(window.location.href.search("id_token="), window.location.href.search("&access_token")).split("=")[1];
+    console.log(token);
+
+    const restricted = info.restricted ? "true" : "false";
+    const session = info.session === "Winter" ? "W" : "S";
+
     const response = await fetch(
       "https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/tracking",
       {
@@ -60,12 +67,12 @@ function App() {
           Authorization: token,
         },
         body: JSON.stringify({
-          session: "W",
-          department: "COMM",
-          number: "104",
-          section: "101",
-          email: "bob@test.com",
-          restricted: "true",
+          session: session,
+          department: info.department,
+          number: info.course_number,
+          section: info.section,
+          email: info.email,
+          restricted: restricted,
         }),
       }
     );
@@ -108,6 +115,21 @@ function App() {
                       <div className="shadow overflow-hidden sm:rounded-md">
                         <div className="px-4 py-5 bg-white sm:p-6">
                           <div className="grid grid-cols-6 gap-6">
+                          <div className="col-span-6 sm:col-span-4 py-2">
+                            <label
+                              htmlFor="Email"
+                              className="block text-lg font-medium text-gray-700"
+                            >
+                              Email
+                            </label>
+                            <input
+                              type="text"
+                              name="email"
+                              id="email"
+                              placeholder="example@gmail.com"
+                              className="mt-1 h-10 pl-1 font-sans focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-lg border-gray-300 rounded-md"
+                            />
+                          </div>
                             <div className="col-span-6 sm:col-span-3 py-2">
                               <label
                                 htmlFor="department"
@@ -126,7 +148,7 @@ function App() {
 
                             <div className="col-span-6 sm:col-span-3 py-2">
                               <label
-                                htmlFor="course-numebr"
+                                htmlFor="course-number"
                                 className="block text-lg font-medium font-sans text-gray-700"
                               >
                                 Course Number
@@ -142,7 +164,7 @@ function App() {
                           </div>
                           <div className="col-span-6 sm:col-span-4 py-2">
                             <label
-                              htmlFor="email-address"
+                              htmlFor="section"
                               className="block text-lg font-medium text-gray-700"
                             >
                               Section
@@ -189,8 +211,16 @@ function App() {
                             <button
                               className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
                               onClick={async () => {
-                                let res = await recordTracking(token);
+                                let res = await recordTracking({
+                                  department: document.getElementById("department").value,
+                                  course_number: document.getElementById("course-number").value,
+                                  section: document.getElementById("section").value,
+                                  session: document.getElementById("session").value,
+                                  restricted: document.getElementById("restricted").checked,
+                                  email: document.getElementById("email").value,
+                                });
                               }}
+                            
                             >
                               Submit
                             </button>

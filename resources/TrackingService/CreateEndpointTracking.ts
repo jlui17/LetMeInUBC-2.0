@@ -111,7 +111,7 @@ exports.handler = async (event: any): Promise<any> => {
 
   return {
     statusCode: 201,
-    headers: {'Access-Control-Allow-Origin': 'https://dxi81lck7ldij.cloudfront.net'},
+    headers: { 'Access-Control-Allow-Origin': 'https://dxi81lck7ldij.cloudfront.net' },
     body: createTrackingResponse
   }
 }

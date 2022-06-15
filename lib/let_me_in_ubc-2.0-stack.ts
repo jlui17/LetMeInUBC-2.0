@@ -61,7 +61,7 @@ export class LetMeInUbc20Stack extends Stack {
         allowMethods: ["GET", "POST", "DELETE"],
         allowCredentials: true,
         //"https://dxi81lck7ldij.cloudfront.net"
-        allowOrigins: ["*"],
+        allowOrigins: ["https://dxi81lck7ldij.cloudfront.net"],
       },
 
       deployOptions: {
@@ -134,10 +134,10 @@ export class LetMeInUbc20Stack extends Stack {
     trackingRoute.addMethod(
       "POST",
       new apigateway.LambdaIntegration(trackingService.createEndpointHandler),
-      // {
-      //   authorizer,
-      //   authorizationType: AuthorizationType.COGNITO,
-      // }
+      {
+        authorizer,
+        authorizationType: AuthorizationType.COGNITO,
+      }
     );
     trackingRoute.addMethod(
       "GET",
@@ -213,7 +213,7 @@ export class LetMeInUbc20Stack extends Stack {
           implicitCodeGrant: true, //generates JWT
         },
         scopes: [OAuthScope.OPENID],
-        callbackUrls: ["https://dxi81lck7ldij.cloudfront.net"], //Must begin with HTTPS else Validation Error
+        callbackUrls: ["https://dxi81lck7ldij.cloudfront.net/"], //Must begin with HTTPS else Validation Error
       },
     });
 
