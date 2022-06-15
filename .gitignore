@@ -6,7 +6,7 @@ node_modules
 !postcss.config.js
 !tailwind.config.js
 
-env
+.env
 
 # CDK asset staging directory
 .cdk.staging

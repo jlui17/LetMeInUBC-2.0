@@ -5,6 +5,7 @@ import {
   AuthorizationType,
   AwsIntegration,
   CognitoUserPoolsAuthorizer,
+  Cors,
   MethodLoggingLevel,
 } from "aws-cdk-lib/aws-apigateway";
 import { Construct } from "constructs";
@@ -57,11 +58,12 @@ export class LetMeInUbc20Stack extends Stack {
           "X-Amz-Date",
           "Authorization",
           "X-Api-Key",
+          "Access-Control-Allow-Origins",
         ],
         allowMethods: ["GET", "POST", "DELETE"],
         allowCredentials: true,
-        //"https://dxi81lck7ldij.cloudfront.net"
-        allowOrigins: ["https://dxi81lck7ldij.cloudfront.net"],
+        //"https://dxi81lck7ldij.cloudfront.net" /
+        allowOrigins: Cors.ALL_ORIGINS,
       },
 
       deployOptions: {
@@ -89,10 +91,10 @@ export class LetMeInUbc20Stack extends Stack {
     coursesRoute.addMethod(
       "GET",
       new apigateway.LambdaIntegration(courseService.getEndpointHandler),
-      // {
-      //   authorizer,
-      //   authorizationType: AuthorizationType.COGNITO,
-      // }
+      {
+        authorizer,
+        authorizationType: AuthorizationType.COGNITO,
+      }
     );
     coursesRoute.addMethod(
       "POST",
@@ -127,7 +129,7 @@ export class LetMeInUbc20Stack extends Stack {
       TRACKING_TABLE_NAME: trackingTable.tableName,
       EMAIL_INDEX_NAME: "emailIndex",
       COURSE_INDEX_NAME: "courseIndex",
-      GET_COURSE_FUNCTION_NAME: courseService.getEndpointHandler.functionName,
+      GET_COURSE_FUNCTION_NAME: courseService.getHandler.functionName,
       GET_COURSE_DATA_FUNCTION_NAME: webService.getCourseDataHandler.functionName,
     });
     const trackingRoute = api.root.addResource("tracking");
@@ -142,18 +144,18 @@ export class LetMeInUbc20Stack extends Stack {
     trackingRoute.addMethod(
       "GET",
       new apigateway.LambdaIntegration(trackingService.getEndpointHandler),
-      // {
-      //   authorizer,
-      //   authorizationType: AuthorizationType.COGNITO,
-      // }
+      {
+        authorizer,
+        authorizationType: AuthorizationType.COGNITO,
+      }
     );
     trackingRoute.addMethod(
       "DELETE",
       new apigateway.LambdaIntegration(trackingService.deleteEndpointHandler),
-      // {
-      //   authorizer,
-      //   authorizationType: AuthorizationType.COGNITO,
-      // }
+      {
+        authorizer,
+        authorizationType: AuthorizationType.COGNITO,
+      }
     );
     trackingTable.grantWriteData(trackingService.createHandler);
     trackingTable.grantReadData(trackingService.getByEmailHandler);
@@ -161,7 +163,7 @@ export class LetMeInUbc20Stack extends Stack {
     trackingTable.grantReadData(trackingService.getByAllCoursesHandler);
     trackingTable.grantWriteData(trackingService.deleteHandler);
 
-    courseService.getEndpointHandler.grantInvoke(trackingService.createEndpointHandler);
+    courseService.getHandler.grantInvoke(trackingService.createEndpointHandler);
     webService.getCourseDataHandler.grantInvoke(trackingService.createEndpointHandler);
 
     const notifyService = new NotifyService(this, "NotifyService", {
