@@ -50,8 +50,9 @@ function App() {
   }
 
 
-  const recordTracking = async (info) => {
+  const recordTracking = async (e, info) => {
     console.log("submit pressed");
+    e.preventDefault();
     const token = window.location.href.slice(window.location.href.search("id_token="), window.location.href.search("&access_token")).split("=")[1];
     console.log(token);
 
@@ -79,6 +80,7 @@ function App() {
     console.log(response);
     const result = await response.json();
     console.log(result);
+    setOpen(false);
     return 200;
   };
 
@@ -210,8 +212,8 @@ function App() {
                           <div className="px-4 py-3 mt-4 bg-ubc-grey-50 text-right sm:px-6">
                             <button
                               className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
-                              onClick={async () => {
-                                let res = await recordTracking({
+                              onClick={async (e) => {
+                                let res = await recordTracking(e, {
                                   department: document.getElementById("department").value,
                                   course_number: document.getElementById("course-number").value,
                                   section: document.getElementById("section").value,
