@@ -12,22 +12,22 @@ exports.handler = async (event: GetTrackingByEmailParams): Promise<any> => {
     const { email } = event;
 
     const courseTrackingParams = {
-    TableName: TRACKING_TABLE_NAME,
-    IndexName: EMAIL_INDEX_NAME,
-    ExpressionAttributeValues: {
-        ":email": email
-    },
-    ProjectionExpression: "courseName",
-    KeyConditionExpression: "email = :email"
+        TableName: TRACKING_TABLE_NAME,
+        IndexName: EMAIL_INDEX_NAME,
+        ExpressionAttributeValues: {
+            ":email": email
+        },
+        ProjectionExpression: "courseName, includeRestrictedSeats",
+        KeyConditionExpression: "email = :email"
     }
 
     const data = await db.query(courseTrackingParams, (error: any, data: any) => {
-    if (error) return [error, error.stack];
+        if (error) return [error, error.stack];
 
-    return data;
+        return data;
     }).promise();
 
-    const courses = data.Items?.map(course => course.courseName);
+    const courses = data.Items?.map(course => ({ name: course.courseName, restricted: course.includeRestrictedSeats }));
 
     return courses;
 }
