@@ -14,6 +14,7 @@ import {
   UserPool,
   OAuthScope,
   VerificationEmailStyle,
+  CfnUserPoolResourceServer,
 } from "aws-cdk-lib/aws-cognito";
 
 import { CourseService } from "./services/CourseService";
@@ -96,16 +97,6 @@ export class LetMeInUbc20Stack extends Stack {
         authorizationType: AuthorizationType.COGNITO,
       }
     );
-    coursesRoute.addMethod(
-      "POST",
-      new apigateway.LambdaIntegration(courseService.getEndpointHandler),
-      {
-        authorizer,
-        authorizationType: AuthorizationType.COGNITO,
-      }
-    );
-    coursesTable.grantWriteData(courseService.createHandler);
-    coursesTable.grantReadData(courseService.getHandler);
 
     const webService = new WebService(this, "WebService", {
       CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR,
@@ -131,6 +122,7 @@ export class LetMeInUbc20Stack extends Stack {
       COURSE_INDEX_NAME: "courseIndex",
       GET_COURSE_FUNCTION_NAME: courseService.getHandler.functionName,
       GET_COURSE_DATA_FUNCTION_NAME: webService.getCourseDataHandler.functionName,
+      CREATE_COURSE_FUNCTION_NAME: courseService.createHandler.functionName,
     });
     const trackingRoute = api.root.addResource("tracking");
     trackingRoute.addMethod(
@@ -157,14 +149,6 @@ export class LetMeInUbc20Stack extends Stack {
         authorizationType: AuthorizationType.COGNITO,
       }
     );
-    trackingTable.grantWriteData(trackingService.createHandler);
-    trackingTable.grantReadData(trackingService.getByEmailHandler);
-    trackingTable.grantReadData(trackingService.getByCourseHandler);
-    trackingTable.grantReadData(trackingService.getByAllCoursesHandler);
-    trackingTable.grantWriteData(trackingService.deleteHandler);
-
-    courseService.getHandler.grantInvoke(trackingService.createEndpointHandler);
-    webService.getCourseDataHandler.grantInvoke(trackingService.createEndpointHandler);
 
     const notifyService = new NotifyService(this, "NotifyService", {
       CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR,
@@ -197,10 +181,6 @@ export class LetMeInUbc20Stack extends Stack {
     const eventRule = new events.Rule(this, 'scheduleRule', {
       schedule: events.Schedule.rate(Duration.minutes(5)),
     })
-    trackingService.getByAllCoursesHandler.grantInvoke(refreshAndNotifyService.handler);
-    trackingService.getByCourseHandler.grantInvoke(refreshAndNotifyService.handler);
-    trackingService.deleteEndpointHandler.grantInvoke(refreshAndNotifyService.handler);
-    eventRule.addTarget(new targets.LambdaFunction(refreshAndNotifyService.handler));
 
     //Create SPA - Cloudfront-SPA for in-built https support, deploy first to get URL
     const spa_app = new SPADeploy(this, "spaDeploy").createSiteWithCloudfront({
@@ -224,5 +204,23 @@ export class LetMeInUbc20Stack extends Stack {
         domainPrefix: "letmeinubc",
       },
     });
+
+    coursesTable.grantWriteData(courseService.createHandler);
+    coursesTable.grantReadData(courseService.getHandler);
+
+    trackingTable.grantWriteData(trackingService.createHandler);
+    trackingTable.grantReadData(trackingService.getByEmailHandler);
+    trackingTable.grantReadData(trackingService.getByCourseHandler);
+    trackingTable.grantReadData(trackingService.getByAllCoursesHandler);
+    trackingTable.grantWriteData(trackingService.deleteHandler);
+
+    courseService.getHandler.grantInvoke(trackingService.createEndpointHandler);
+    courseService.createHandler.grantInvoke(trackingService.createEndpointHandler);
+    webService.getCourseDataHandler.grantInvoke(trackingService.createEndpointHandler);
+
+    trackingService.getByAllCoursesHandler.grantInvoke(refreshAndNotifyService.handler);
+    trackingService.getByCourseHandler.grantInvoke(refreshAndNotifyService.handler);
+    trackingService.deleteEndpointHandler.grantInvoke(refreshAndNotifyService.handler);
+    eventRule.addTarget(new targets.LambdaFunction(refreshAndNotifyService.handler));
   }
 }

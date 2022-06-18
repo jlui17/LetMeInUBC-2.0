@@ -20,20 +20,12 @@ const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest): Promise
 };
 
 exports.handler = async (event: any): Promise<any> => {
-  const courseNames: { 
-    department: string, 
-    section: string, 
-    number: string, 
-    session: string }[] = JSON.parse(event.body);
-
-  const getCourseParams: string[] = courseNames.map((course) => {
-    const { session, department, number, section } = course;
-    return `${session} ${department} ${number} ${section}`;
-  });
+  const getCourseNameParams: string = event.queryStringParameters.courses;
+  const getCourseNames: string[] = getCourseNameParams.split(',');
 
   const getCourseInvokeParams = {
     FunctionName: GET_COURSE_FUNCTION_NAME,
-    Payload: Buffer.from(JSON.stringify(getCourseParams)),
+    Payload: Buffer.from(JSON.stringify(getCourseNames)),
   }
 
   const getCourseResponse = await invokeLambdaAndGetData(getCourseInvokeParams);
@@ -45,6 +37,7 @@ exports.handler = async (event: any): Promise<any> => {
 
   return {
     statusCode: 200,
+    headers: { 'Access-Control-Allow-Origin': 'https://dxi81lck7ldij.cloudfront.net' },
     body: JSON.stringify(getCourseResponse)
   };
 }

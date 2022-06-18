@@ -19,6 +19,7 @@ const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest): Promise
 const CREATE_TRACKING_FUNCTION_NAME = process.env.CREATE_TRACKING_FUNCTION_NAME ? process.env.CREATE_TRACKING_FUNCTION_NAME : "";
 const GET_COURSE_FUNCTION_NAME = process.env.GET_COURSE_FUNCTION_NAME ? process.env.GET_COURSE_FUNCTION_NAME : "";
 const GET_COURSE_DATA_FUNCTION_NAME = process.env.GET_COURSE_DATA_FUNCTION_NAME ? process.env.GET_COURSE_DATA_FUNCTION_NAME : "";
+const CREATE_COURSE_FUNCTION_NAME = process.env.CREATE_COURSE_FUNCTION_NAME ? process.env.CREATE_COURSE_FUNCTION_NAME : "";
 
 exports.handler = async (event: any): Promise<any> => {
   const { department, section, number, session, email, restricted } = JSON.parse(event.body);
@@ -74,6 +75,29 @@ exports.handler = async (event: any): Promise<any> => {
         body: getCourseDataResponse.error
       }
     }
+
+    const createCourseParams: {
+      department: string,
+      section: string,
+      number: string,
+      session: string,
+      description: string,
+      title: string,
+    } = {
+      department: getCourseDataResponse.department || "",
+      section: getCourseDataResponse.section || "",
+      number: getCourseDataResponse.number || "",
+      session: getCourseDataResponse.session || "",
+      description: getCourseDataResponse.description || "",
+      title: getCourseDataResponse.title || "",
+    }
+  
+    const createCourseInvokeParams = {
+      FunctionName: CREATE_COURSE_FUNCTION_NAME,
+      Payload: Buffer.from(JSON.stringify(createCourseParams)),
+    }
+
+    new Lambda().invoke(createCourseInvokeParams).send();
   }
 
   const createTrackingParams: {

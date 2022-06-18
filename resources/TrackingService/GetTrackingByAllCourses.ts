@@ -18,5 +18,7 @@ exports.handler = async (): Promise<any> => {
 
     const allCourses = data.Items?.map(course => course.courseName);
 
-    return allCourses;
+    const uniqueAllCourses = Array.from(new Set(allCourses));
+
+    return uniqueAllCourses;
 }

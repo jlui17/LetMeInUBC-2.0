@@ -1,5 +1,4 @@
 import { Lambda } from 'aws-sdk';
-import { bool } from 'aws-sdk/clients/signer';
 
 const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest): Promise<string[]> => {
   const invokeLambda = (params: Lambda.InvocationRequest) => {
@@ -29,12 +28,7 @@ interface emailParams {
   email: string,
 }
 
-interface endpointResponse {
-  statusCode: number, 
-  body?: string,
-}
-
-exports.handler = async (event: any): Promise<endpointResponse> => {
+exports.handler = async (event: any): Promise<any> => {
   const { key } = event.queryStringParameters;
 
   let invokeParams: Lambda.InvocationRequest;
@@ -115,6 +109,7 @@ exports.handler = async (event: any): Promise<endpointResponse> => {
     default:
       return {
         statusCode: 400,
+        headers: { 'Access-Control-Allow-Origin': 'https://dxi81lck7ldij.cloudfront.net' },
         body: "Your key should be one of 'courseName', 'email', or 'allCourses'."
       };
   }

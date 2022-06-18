@@ -62,6 +62,7 @@ export class TrackingService extends Construct {
         CREATE_TRACKING_FUNCTION_NAME: this.createHandler.functionName,
         GET_COURSE_FUNCTION_NAME: props.GET_COURSE_FUNCTION_NAME,
         GET_COURSE_DATA_FUNCTION_NAME: props.GET_COURSE_DATA_FUNCTION_NAME,
+        CREATE_COURSE_FUNCTION_NAME: props.CREATE_COURSE_FUNCTION_NAME,
       }
     });
 
