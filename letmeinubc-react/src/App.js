@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
+import jwt_decode from 'jwt-decode';
 
 function App() {
   const [open, setOpen] = useState(false);
@@ -22,6 +23,7 @@ function App() {
     { department: "CPSC", number: "340", section: "001", restricted: false },
     { department: "CPSC", number: "340", section: "001", restricted: true },
   ];
+
 
   const coursesList = courses.map((course) => (
     <li className="text-lg font-medium font-sans text-gray-700 hover:outline hover:outline-1 py-2 my-2 mx-2 rounded-lg">
@@ -45,6 +47,17 @@ function App() {
   let tokenLogin;
   try {
     tokenLogin = window.location.href.split('=')[1].split('&'[0])[0];
+    const getCourse = fetch("https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/tracking",
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: tokenLogin,
+        },
+        key: "email",
+        email: jwt_decode(tokenLogin).email,
+      })
+    console.log(getCourse);
   } catch (e) {
     return <div>You are not signed in</div>;
   }
@@ -58,6 +71,7 @@ function App() {
 
     const restricted = info.restricted ? "true" : "false";
     const session = info.session === "Winter" ? "W" : "S";
+    const email = jwt_decode(token).email;
 
     const response = await fetch(
       "https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/tracking",
@@ -72,7 +86,7 @@ function App() {
           department: info.department,
           number: info.course_number,
           section: info.section,
-          email: info.email,
+          email: email,
           restricted: restricted,
         }),
       }
@@ -83,6 +97,8 @@ function App() {
     setOpen(false);
     return 200;
   };
+
+
 
   return (
     <>
@@ -117,21 +133,7 @@ function App() {
                       <div className="shadow overflow-hidden sm:rounded-md">
                         <div className="px-4 py-5 bg-white sm:p-6">
                           <div className="grid grid-cols-6 gap-6">
-                          <div className="col-span-6 sm:col-span-4 py-2">
-                            <label
-                              htmlFor="Email"
-                              className="block text-lg font-medium text-gray-700"
-                            >
-                              Email
-                            </label>
-                            <input
-                              type="text"
-                              name="email"
-                              id="email"
-                              placeholder="example@gmail.com"
-                              className="mt-1 h-10 pl-1 font-sans focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-lg border-gray-300 rounded-md"
-                            />
-                          </div>
+
                             <div className="col-span-6 sm:col-span-3 py-2">
                               <label
                                 htmlFor="department"
@@ -219,7 +221,6 @@ function App() {
                                   section: document.getElementById("section").value,
                                   session: document.getElementById("session").value,
                                   restricted: document.getElementById("restricted").checked,
-                                  email: document.getElementById("email").value,
                                 });
                               }}
                             
