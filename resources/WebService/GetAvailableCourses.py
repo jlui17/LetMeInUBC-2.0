@@ -105,11 +105,14 @@ def get_seat_summary(section_data):
     if "no longer offered" in soup.text:
         raise InvalidSectionError("Section does not exist")
     
-    if "Out of Service" in soup.find('div', attrs={'class': 'content expand'}).text:
+    if "Out of Service" in soup.text:
         raise OutOfServiceException()
     
     if not title or not description:
         raise MissingAttributeException(soup.text)
+
+    if not soup.find('table', attrs={'class': '\'table'}):
+        raise InvalidSectionError("Seat table not found")
 
     seat_summary = {
         'title': title.text,
@@ -129,14 +132,14 @@ def get_seat_summary(section_data):
 def get_available_sections(sections):
     if not sections:
         return
-    sections_to_refresh = sections
 
     available_sections = []
     invalid_sections = []
 
     print(":: get_available_sections: Seat summaries")
 
-    for section in sections_to_refresh:
+    for section in sections:
+        print(":: Getting seat info for {}...".format(get_section_string(section)))
         try:
             seat_summary = get_seat_summary(section)
             section['title'] = seat_summary['title']

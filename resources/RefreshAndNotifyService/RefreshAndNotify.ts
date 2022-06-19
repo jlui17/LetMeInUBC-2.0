@@ -28,13 +28,12 @@ exports.handler = async (event: any): Promise<any> => {
     };
     response = await lambda.invoke(params).promise();
     const allCourses: string[] = JSON.parse(response.Payload as string);
-    const uniqueCourses: string[] = [...new Set(allCourses)]  // temporary fix for now, this should be handled by the Lambda
 
     params = {
       FunctionName: GET_AVAILABLE_COURSES,
       InvocationType: "RequestResponse",
       Payload: JSON.stringify({
-        sections: uniqueCourses,
+        sections: allCourses,
       }),
       LogType: "Tail",
     };
