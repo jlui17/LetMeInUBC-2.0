@@ -32,12 +32,13 @@ exports.handler = async (event: any): Promise<any> => {
 
   // if course not found in table
   if (getCourseResponse.length === 0) return {
-    statusCode: 404
-  }
+    statusCode: 404,
+    headers: { "Access-Control-Allow-Origin": "*" },
+  };
 
   return {
     statusCode: 200,
-    headers: { 'Access-Control-Allow-Origin': 'https://dxi81lck7ldij.cloudfront.net' },
-    body: JSON.stringify(getCourseResponse)
+    headers: { "Access-Control-Allow-Origin": "*" },
+    body: JSON.stringify(getCourseResponse),
   };
 }

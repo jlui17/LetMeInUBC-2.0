@@ -1,72 +1,115 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useRef, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import jwt_decode from 'jwt-decode';
+import jwt_decode from "jwt-decode";
 
 function App() {
   const [open, setOpen] = useState(false);
+  const [courses, setCourses] = useState("");
+  const [courseList, setCourseList] = useState([]);
 
-  const courses = [
-    { department: "CPSC", number: "340", section: "001", restricted: false },
-    { department: "CPSC", number: "340", section: "001", restricted: false },
-    { department: "CPSC", number: "340", section: "001", restricted: false },
-    { department: "CPSC", number: "340", section: "001", restricted: false },
-    { department: "CPSC", number: "340", section: "001", restricted: false },
-    { department: "CPSC", number: "340", section: "001", restricted: false },
-    { department: "CPSC", number: "340", section: "001", restricted: false },
-    { department: "CPSC", number: "340", section: "001", restricted: false },
-    { department: "CPSC", number: "340", section: "001", restricted: false },
-    { department: "CPSC", number: "340", section: "001", restricted: false },
-    { department: "CPSC", number: "340", section: "001", restricted: false },
-    { department: "CPSC", number: "340", section: "001", restricted: false },
-    { department: "CPSC", number: "340", section: "001", restricted: false },
-    { department: "CPSC", number: "340", section: "001", restricted: true },
-  ];
+  const handleUpdateList = (courses) => {
+    setCourseList(
+      courses.map((course) => (
+        <li className="text-lg font-medium font-sans text-gray-700 hover:outline hover:outline-1 py-2 my-2 mx-2 rounded-lg" key={course.title}>
+          <label
+            className="form-check-label inline-block text-gray-800"
+            for="delete"
+          >
+            <input
+              className="form-check-input appearance-none mx-4 h-5 w-5 border rounded-md border-ubc-grey bg-white checked:bg-ubc-blue focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer"
+              type="checkbox"
+              value=""
+              id="delete"
+            />
+            <span className="p-2">{course.department}</span>
+            <span className="p-2">{course.number}</span>
+            <span className="p-2">{course.section}</span>
+            <span className="p-2">{course.session}</span>
+            <span className="p-2">
+              {course.restricted ? "Restricted + General" : "General Only"}
+            </span>
+            <span className="p-2">{course.description}</span>
+          </label>
+        </li>
+      ))
+    );
+      document.querySelectorAll("[type=checkbox]").forEach((checkbox) => {
+        checkbox.addEventListener("click", function (e) {
+          if (this.checked) {
+            this.parentElement.parentElement.setAttribute(
+              "aria-checked",
+              "true"
+            );
+          } else {
+            this.parentElement.parentElement.setAttribute(
+              "aria-checked",
+              "false"
+            );
+          }
+          e.stopPropagation();
+        });
+      });
+  };
 
-
-  const coursesList = courses.map((course) => (
-    <li className="text-lg font-medium font-sans text-gray-700 hover:outline hover:outline-1 py-2 my-2 mx-2 rounded-lg">
-      <input
-        class="form-check-input appearance-none mx-4 h-5 w-5 border rounded-md border-ubc-grey bg-white checked:bg-ubc-blue focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer"
-        type="checkbox"
-        value=""
-        id="delete"
-      />
-      <label class="form-check-label inline-block text-gray-800" for="delete">
-        <span className="p-4">{course.department}</span>
-        <span className="p-4">{course.number}</span>
-        <span className="p-4">{course.section}</span>
-        <span className="p-4">
-          {course.restricted ? "Restricted + General" : "General Only"}
-        </span>
-      </label>
-    </li>
-  ));
-
-  let tokenLogin;
-  try {
-    tokenLogin = window.location.href.split('=')[1].split('&'[0])[0];
-    const getCourse = fetch("https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/tracking",
+  useEffect(() => {
+    const courseDetail = fetch(
+      `https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/courses?courses=${courses}`,
       {
         method: "GET",
         headers: {
           Accept: "application/json",
           Authorization: tokenLogin,
         },
-        key: "email",
-        email: jwt_decode(tokenLogin).email,
-      })
-    console.log(getCourse);
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        trackedCourses = data;
+        console.log(data);
+        handleUpdateList(data);
+      });
+  }, [courses]);
+
+  let trackedCourses;
+
+  let tokenLogin;
+  try {
+    // tokenLogin = window.location.href.split('=')[1].split('&'[0])[0];
+    tokenLogin =
+      "eyJraWQiOiJveWtvam55MnN3WU5waVliMGtWeHRqZkY5ZHlMalVpMmRXdDZkRFBJbnprPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoiS0dnNEtFVUo4eDE0Uk1TUmczVWFXdyIsInN1YiI6IjQ5MDA1NjIwLWE0M2QtNDJkMC1iM2U0LTRhYjYzN2ZjZGM3MiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtd2VzdC0yLmFtYXpvbmF3cy5jb21cL3VzLXdlc3QtMl9jejZNREZ0aVYiLCJjb2duaXRvOnVzZXJuYW1lIjoiNDkwMDU2MjAtYTQzZC00MmQwLWIzZTQtNGFiNjM3ZmNkYzcyIiwiYXVkIjoiMnNoZ3B1MTRubmo0dWxpcGU1dWk2amE2YjciLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTY1NTYyMTY0NywiZXhwIjoxNjU1NjI1MjQ3LCJpYXQiOjE2NTU2MjE2NDcsImp0aSI6IjI3MGUzNjg4LTgwODEtNDZjMy1hMGM4LTNlYzI4ZmNjMjdjZiIsImVtYWlsIjoibHhyZW40NjBAZ21haWwuY29tIn0.2TaiXyPW5Q_m1mwShqJBIIgF0B6Lnkv2ucXdOo3_qnFvzoDZz_fnCoT2hrNQoRiIOB7UPBiCeZ1mOe6lJFI39dl_2eVsjfk1ivEZqHIKwDvIAqIfpGJ5ZjFgg4P7iRwdr1pVwmCiewOs3a0AiFfqctobUC-eaK77oMVSCafw41pZf66-EErNNgZSJUzQ5AO04zWzw2_qaZnSwh8NMidGVke4YuWf6gDjVka7nfAHBoVX_BtS4eHqodKd-Cu-f04z4iwkyYxd-o7ZR94sgSRmsTHJa-fs596eoSUePOLnvim-n6RaieF2Oj7id6q_sVFEMs_KOBuYkLTmD5m1SAQrGA";
+  
+    const getCourse = fetch(
+      `https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/tracking?key=email&email=${
+        jwt_decode(tokenLogin).email
+      }`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: tokenLogin,
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        trackedCourses = data;
+        setCourses(trackedCourses?.map((course) => course.name).join(","));
+      });
   } catch (e) {
     return <div>You are not signed in</div>;
   }
 
-
   const recordTracking = async (e, info) => {
     console.log("submit pressed");
     e.preventDefault();
-    const token = window.location.href.slice(window.location.href.search("id_token="), window.location.href.search("&access_token")).split("=")[1];
+    const token = window.location.href
+      .slice(
+        window.location.href.search("id_token="),
+        window.location.href.search("&access_token")
+      )
+      .split("=")[1];
     console.log(token);
 
     const restricted = info.restricted ? "true" : "false";
@@ -97,8 +140,7 @@ function App() {
     setOpen(false);
     return 200;
   };
-
-
+ 
 
   return (
     <>
@@ -133,7 +175,6 @@ function App() {
                       <div className="shadow overflow-hidden sm:rounded-md">
                         <div className="px-4 py-5 bg-white sm:p-6">
                           <div className="grid grid-cols-6 gap-6">
-
                             <div className="col-span-6 sm:col-span-3 py-2">
                               <label
                                 htmlFor="department"
@@ -216,14 +257,20 @@ function App() {
                               className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
                               onClick={async (e) => {
                                 let res = await recordTracking(e, {
-                                  department: document.getElementById("department").value,
-                                  course_number: document.getElementById("course-number").value,
-                                  section: document.getElementById("section").value,
-                                  session: document.getElementById("session").value,
-                                  restricted: document.getElementById("restricted").checked,
+                                  department:
+                                    document.getElementById("department").value,
+                                  course_number:
+                                    document.getElementById("course-number")
+                                      .value,
+                                  section:
+                                    document.getElementById("section").value,
+                                  session:
+                                    document.getElementById("session").value,
+                                  restricted:
+                                    document.getElementById("restricted")
+                                      .checked,
                                 });
                               }}
-                            
                             >
                               Submit
                             </button>
@@ -247,7 +294,7 @@ function App() {
               </h3>
               <p className="mt-1 text-lg font-sans font-medium text-ubc-grey mt-3">
                 Register Course: <br /> When a spot is available for the course
-                you will receive a email.
+                you will receive an email.
               </p>
             </div>
           </div>
@@ -256,7 +303,7 @@ function App() {
               <div className="px-4 py-5 bg-white sm:p-6">
                 <div className="">
                   <ul className="max-h-80 ml-4 mt-4 overflow-auto overflow-y-scroll border-red-800">
-                    {coursesList}
+                    {courseList}
                   </ul>
                 </div>
 

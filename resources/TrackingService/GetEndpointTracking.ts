@@ -55,11 +55,13 @@ exports.handler = async (event: any): Promise<any> => {
 
       if (emails.length === 0) 
         return {
-          statusCode: 404
+          statusCode: 404,
+          headers: { 'Access-Control-Allow-Origin': "*" },
         };
 
       return {
         statusCode: 200,
+        headers: { 'Access-Control-Allow-Origin': "*" },
         body: JSON.stringify(emails),
       };
 
@@ -78,11 +80,15 @@ exports.handler = async (event: any): Promise<any> => {
 
       if (courses.length === 0) 
         return {
-          statusCode: 404
+          statusCode: 404,
+          headers: { 'Access-Control-Allow-Origin': "*" },
         };
 
       return {
         statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
         body: JSON.stringify(courses),
       };
 
@@ -97,11 +103,17 @@ exports.handler = async (event: any): Promise<any> => {
 
     if (allCourses.length === 0) 
       return {
-        statusCode: 404
+        statusCode: 404,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
       };
 
     return {
       statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify(allCourses),
     };
     
@@ -109,8 +121,10 @@ exports.handler = async (event: any): Promise<any> => {
     default:
       return {
         statusCode: 400,
-        headers: { 'Access-Control-Allow-Origin': 'https://dxi81lck7ldij.cloudfront.net' },
-        body: "Your key should be one of 'courseName', 'email', or 'allCourses'."
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: "Your key should be one of 'courseName', 'email', or 'allCourses'.",
       };
   }
 }
