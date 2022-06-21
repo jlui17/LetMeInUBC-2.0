@@ -27,6 +27,8 @@ import * as events from 'aws-cdk-lib/aws-events'
 import * as targets from 'aws-cdk-lib/aws-events-targets'
 
 const CURRENT_SCHOOL_YEAR = "2021";
+const REFRESH_INTERVAL = Duration.minutes(5);
+const PAUSE_BETWEEN_REQUESTS = "0";
 
 export class LetMeInUbc20Stack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -100,6 +102,7 @@ export class LetMeInUbc20Stack extends Stack {
 
     const webService = new WebService(this, "WebService", {
       CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR,
+      PAUSE_BETWEEN_REQUESTS: PAUSE_BETWEEN_REQUESTS,
     });
 
     const trackingTable = new dynamodb.Table(this, "Tracking", {
@@ -179,7 +182,7 @@ export class LetMeInUbc20Stack extends Stack {
       }),
     );
     const eventRule = new events.Rule(this, 'scheduleRule', {
-      schedule: events.Schedule.rate(Duration.minutes(5)),
+      schedule: events.Schedule.rate(REFRESH_INTERVAL),
     })
 
     //Create SPA - Cloudfront-SPA for in-built https support, deploy first to get URL

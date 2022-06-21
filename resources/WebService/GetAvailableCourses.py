@@ -1,9 +1,11 @@
 import os
 import random
+import time
 import requests
 from bs4 import BeautifulSoup
 
 CURRENT_SCHOOL_YEAR = int(os.environ['CURRENT_SCHOOL_YEAR'])
+PAUSE_BETWEEN_REQUESTS = int(os.environ['PAUSE_BETWEEN_REQUESTS'])
 SECTION_URL_TEMPLATE = "https://courses.students.ubc.ca/cs/courseschedule?" \
                        "sesscd={}&pname=subjarea&tname=subj-section&sessyr={}&dept={}&course={}&section={}"
 
@@ -101,17 +103,24 @@ def get_seat_summary(section_data):
     soup = get_section_soup(section_data)
     title = soup.find('h4')
     description = soup.find('h5')
-
-    if "no longer offered" in soup.text:
-        raise InvalidSectionError("Section does not exist")
-    
-    if "Out of Service" in soup.text:
-        raise OutOfServiceException()
     
     if not title or not description:
         raise MissingAttributeException(soup.text)
 
     if not soup.find('table', attrs={'class': '\'table'}):
+        if "no longer offered" in soup.text:
+            raise InvalidSectionError("Section does not exist")
+
+        if "Sorry for" in soup.text:
+            print(":: CAPTCHA detected")
+            raise OutOfServiceException()
+
+        if "Out of Service" in soup.text or "The requested resource" in soup.text:
+            print(":: SSC out of service")
+            raise OutOfServiceException()
+
+        print(":: Unable to get info for " + get_section_string(section_data) + ", dumping soup...")
+        print(soup.text)
         raise InvalidSectionError("Seat table not found")
 
     seat_summary = {
@@ -152,7 +161,6 @@ def get_available_sections(sections):
             elif seat_summary['Restricted'] > 0:
                 section['restricted'] = 'true'
                 available_sections.append(section)
-
         except InvalidSectionError as e:
             invalid_sections.append({
                 'course': section,
@@ -167,6 +175,7 @@ def get_available_sections(sections):
         except requests.exceptions.RequestException as e:
             # print(e)
             pass
+        time.sleep(PAUSE_BETWEEN_REQUESTS)
 
     if invalid_sections:
         print(":: get_available_sections: Invalid section(s): " + str(invalid_sections))

@@ -89,7 +89,7 @@ exports.handler = async (event: any): Promise<any> => {
     }
 
     // invalid course handling
-    for (let invalidDict of invalidCourses) {
+    /* for (let invalidDict of invalidCourses) {
       const queryParams = invalidDict['course'];
       queryParams['restricted'] = 'false';
       params = {
@@ -113,7 +113,7 @@ exports.handler = async (event: any): Promise<any> => {
         console.log(":: Invalid tracking removed:" + JSON.stringify(queryParams));
         response = await lambda.invoke(params).promise();
       }
-    }
+    } */
 
     return notifyArr;
 }

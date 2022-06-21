@@ -21,7 +21,8 @@ export class WebService extends Construct {
       entry: RESOURCE_FOLDER,
       timeout: cdk.Duration.minutes(5),
       environment: {
-        'CURRENT_SCHOOL_YEAR': props.CURRENT_SCHOOL_YEAR
+        'CURRENT_SCHOOL_YEAR': props.CURRENT_SCHOOL_YEAR,
+        'PAUSE_BETWEEN_REQUESTS': props.PAUSE_BETWEEN_REQUESTS
       },
       layers: [
         webServiceDependencyLayer,
