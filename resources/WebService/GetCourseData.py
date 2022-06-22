@@ -21,6 +21,10 @@ class MissingAttributeException(Exception):
     pass
 
 
+class MissingSeatsException(Exception):
+    pass
+
+
 # From https://www.jcchouinard.com/random-user-agent-with-python-and-beautifulsoup/
 def get_random_ua():
     ua_strings = [
@@ -64,13 +68,16 @@ def get_section_data(section):
     title = soup.find('h4')
     description = soup.find('h5')
 
-    if "no longer offered" in soup.text:
-        raise InvalidSectionError("Section does not exist")
-    
-    if "Out of Service" in soup.find('div', attrs={'class': 'content expand'}).text:
-        raise OutOfServiceException()
-    
+    if not soup.find('table', attrs={'class': '\'table'}):
+        raise MissingSeatsException()
+
     if not title or not description:
+        if "no longer offered" in soup.text:
+            raise InvalidSectionError()
+        
+        if "Out of Service" in soup.text:
+            raise OutOfServiceException()
+
         raise MissingAttributeException(str(soup))
 
     section_data = {
@@ -102,6 +109,10 @@ def handler(event, context):
     except MissingAttributeException as e:
         return {
             'error': "Unable to parse data (Most likely CAPTCHA)"
+        }
+    except MissingSeatsException as e:
+        return {
+            'error': "This section contains no trackable seats"
         }
     except Exception as e:
         return {
