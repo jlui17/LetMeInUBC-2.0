@@ -53,11 +53,13 @@ exports.handler = async (event: any): Promise<any> => {
         LogType: "Tail",
       };
       response = await lambda.invoke(params).promise();
-      const emails = JSON.parse(response.Payload as string);
-      notifyArr.push({
-        course: course,
-        emails,
-      });
+      const emails: Array<string> = JSON.parse(response.Payload as string);
+      if (emails.length) {
+        notifyArr.push({
+          course: course,
+          emails,
+        });
+      }
     }
 
     // notify then remove tracking

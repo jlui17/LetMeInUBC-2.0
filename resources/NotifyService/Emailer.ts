@@ -72,7 +72,11 @@ exports.handler = async function (event: any) {
         // const courseName: string = getCourseName(notifyDict["course"]);
         const courseURL: string = getCourseURL(notifyDict["course"]);
         
-        await sendEmail(emails, courseDict['title'], courseDict['description'], courseURL, courseDict['restricted_only']);
+        if (Array.isArray(emails) && emails.length) {
+            await sendEmail(emails, courseDict['title'], courseDict['description'], courseURL, courseDict['restricted_only']);
+        } else {
+            console.log(":: Invalid emails array");
+        }
     }
     return event.data
 };
