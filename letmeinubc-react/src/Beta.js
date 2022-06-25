@@ -151,7 +151,11 @@ function Beta() {
           restricted: restricted,
         }),
       }
-    );
+    ).then((response) => {
+      if (response.status === 404) {
+        alert("Invalid Course Specified");
+      }  
+    });
 
     getCourses(tokenLogin);
     setOpen(false);
