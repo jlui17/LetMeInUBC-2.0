@@ -46,6 +46,7 @@ exports.handler = async (event: any): Promise<any> => {
   const response: string = await invokeLambdaAndGetData(invokeParams);
 
   return {
-    statusCode: 200
-  }
+    statusCode: 200,
+    headers: { "Access-Control-Allow-Origin": "*" },
+  };
 }

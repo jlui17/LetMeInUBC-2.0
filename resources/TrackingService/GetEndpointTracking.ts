@@ -56,7 +56,7 @@ exports.handler = async (event: any): Promise<any> => {
       if (emails.length === 0) 
         return {
           statusCode: 404,
-          headers: { 'Access-Control-Allow-Origin': "*" },
+      headers: { 'Access-Control-Allow-Origin': "*" },    
         };
 
       return {
@@ -80,8 +80,9 @@ exports.handler = async (event: any): Promise<any> => {
 
       if (courses.length === 0) 
         return {
-          statusCode: 404,
+          statusCode: 200,
           headers: { 'Access-Control-Allow-Origin': "*" },
+          body: JSON.stringify(courses),
         };
 
       return {

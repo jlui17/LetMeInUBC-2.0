@@ -71,9 +71,9 @@ exports.handler = async (event: any): Promise<any> => {
     if (getCourseDataResponse.error) {
       return {
         statusCode: 404,
-        headers: {'Access-Control-Allow-Origin': 'https://dxi81lck7ldij.cloudfront.net'},
-        body: getCourseDataResponse.error
-      }
+        headers: { "Access-Control-Allow-Origin": "*" },
+        body: getCourseDataResponse.error,
+      };
     }
 
     const createCourseParams: {
@@ -125,7 +125,7 @@ exports.handler = async (event: any): Promise<any> => {
 
   return {
     statusCode: 201,
-    headers: { 'Access-Control-Allow-Origin': 'https://dxi81lck7ldij.cloudfront.net' },
-    body: createTrackingResponse
-  }
+    headers: { "Access-Control-Allow-Origin": "*" },
+    body: createTrackingResponse,
+  };
 }
