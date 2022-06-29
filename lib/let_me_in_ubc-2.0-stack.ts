@@ -28,7 +28,7 @@ import * as targets from 'aws-cdk-lib/aws-events-targets'
 
 const CURRENT_SCHOOL_YEAR = "2021";
 const REFRESH_INTERVAL = Duration.minutes(5);
-const PAUSE_BETWEEN_REQUESTS = "0";
+const PAUSE_BETWEEN_REQUESTS = "0"; // seconds
 
 export class LetMeInUbc20Stack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {

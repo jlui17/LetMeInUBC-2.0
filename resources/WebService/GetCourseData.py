@@ -68,14 +68,18 @@ def get_section_data(section):
     title = soup.find('h4')
     description = soup.find('h5')
 
-    if not soup.find('table', attrs={'class': '\'table'}):
-        raise MissingSeatsException()
+    # if not soup.find('table', attrs={'class': '\'table'}):
+    #     raise MissingSeatsException()
 
     if not title or not description:
         if "no longer offered" in soup.text:
             raise InvalidSectionError()
+
+        if "Sorry for" in soup.text:
+            print(":: CAPTCHA detected")
+            raise OutOfServiceException()
         
-        if "Out of Service" in soup.text:
+        if "Out of Service" in soup.text or "The requested resource" in soup.text or "Please wait" in soup.text or "error has occurred" in soup.text:
             raise OutOfServiceException()
 
         raise MissingAttributeException(str(soup))
