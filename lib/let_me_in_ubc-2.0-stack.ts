@@ -26,7 +26,7 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as events from 'aws-cdk-lib/aws-events'
 import * as targets from 'aws-cdk-lib/aws-events-targets'
 
-const CURRENT_SCHOOL_YEAR = "2021";
+const CURRENT_SCHOOL_YEAR = "2022";
 const REFRESH_INTERVAL = Duration.minutes(5);
 const PAUSE_BETWEEN_REQUESTS = "0"; // seconds
 

@@ -8,6 +8,8 @@ function Beta() {
   const [open, setOpen] = useState(false);
   const [courses, setCourses] = useState("");
   const [courseList, setCourseList] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const handleUpdateList = (courses) => {
     setCourseList(
@@ -104,7 +106,8 @@ function Beta() {
   let trackedCourses;
   let tokenLogin;
   try {
-    tokenLogin = window.location.href.split('=')[1].split('&'[0])[0];
+    tokenLogin = window.location.href.split("=")[1].split("&"[0])[0];
+    
     getCourses(tokenLogin);
   } catch (e) {
     return (
@@ -120,6 +123,7 @@ function Beta() {
   }
 
   const recordTracking = async (e, info) => {
+    setLoading(true);
     e.preventDefault();
     // const token = window.location.href
     //   .slice(
@@ -154,16 +158,18 @@ function Beta() {
     ).then((response) => {
       if (response.status === 404) {
         alert("Invalid Course Specified");
-      }  
+      }
     });
 
     getCourses(tokenLogin);
+    setLoading(false);
     setOpen(false);
 
     return 200;
   };
 
   async function deleteSelectedTracking() {
+    setDeleteLoading(true);
     var items = document.querySelectorAll("input[type=checkbox]:checked");
     for (var i = 0; i < items.length; i++) {
       console.log(items[i].id.replace(/\s+/g, " ").trim().split(" "));
@@ -186,6 +192,7 @@ function Beta() {
         }
       );
     }
+    setDeleteLoading(false);
     getCourses(tokenLogin);
   }
 
@@ -305,7 +312,7 @@ function Beta() {
                           </div>
                           <div className="px-4 py-3 mt-4 bg-ubc-grey-50 text-right sm:px-6">
                             <button
-                              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
+                              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500 disabled:opacity-50 disabled:cursor-not-allowed"
                               onClick={async (e) => {
                                 let res = await recordTracking(e, {
                                   department: trim(
@@ -330,8 +337,18 @@ function Beta() {
                                       .checked,
                                 });
                               }}
+                              disabled={loading}
                             >
-                              Submit
+                              {loading && (
+                                <span className="text-lg font-lg font-sans text-white">
+                                  Submitting...
+                                </span>
+                              )}
+                              {!loading && (
+                                <span className="text-lg font-lg font-sans text-white">
+                                  Submit
+                                </span>
+                              )}
                             </button>
                           </div>
                         </div>
@@ -345,33 +362,42 @@ function Beta() {
         </Dialog>
       </Transition.Root>
       <div className="mt-10 my-20 sm:mt-10 sm:mx-40 bg-ubc-blue px-20 py-10 rounded-lg m-1">
-        <div className="md:grid md:grid-cols-3 md:gap-6">
+        <div className="md:grid md:grid-cols-3 md:gap-6 ">
           <div className="md:col-span-1">
             <div className="px-4 sm:px-0">
               <h3 className="text-3xl font-sans font-bold leading-6 text-white">
                 LetMeInUBC
               </h3>
               <p className="mt-1 text-lg font-sans font-medium text-ubc-grey mt-3">
-                Register Course: <br /> When a spot is available for the course
-                you will receive an email.
+                Register Course: <br /> Add courses to your watch-list and when a spot is available, you will be notified by email.
               </p>
             </div>
           </div>
           <div className="mt-5 md:mt-0 md:col-span-2">
             <div className="shadow overflow-hidden sm:rounded-md">
-              <div className="px-4 py-5 bg-white sm:p-6">
+              <div className="px-4 py-5 bg-white sm:p-6 h-half-screen relative">
                 <div className="">
                   <ul className="max-h-80 ml-4 mt-4 overflow-auto overflow-y-scroll border-red-800">
                     {courseList}
                   </ul>
                 </div>
 
-                <div className="px-4 py-3 mt-4 bg-ubc-grey-50 text-right sm:px-6">
+                <div className="px-4 py-4 m-4 text-right sm:px-6 absolute bottom-0 right-0">
                   <button
-                    className="inline-flex justify-center py-2 px-4 mr-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
+                    className="inline-flex justify-center py-2 px-4 mr-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={deleteSelectedTracking}
+                    disabled={deleteLoading}
                   >
-                    Delete
+                    {deleteLoading && (
+                      <span className="text-lg font-lg font-sans text-white">
+                        Deleting...
+                      </span>
+                    )}
+                    {!deleteLoading && (
+                      <span className="text-lg font-lg font-sans text-white">
+                        Delete
+                      </span>
+                    )}
                   </button>
                   <button
                     className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"

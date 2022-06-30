@@ -13,6 +13,7 @@ node_modules
 !Beta.js
 
 .env
+.DS_Store
 
 
 # CDK asset staging directory
