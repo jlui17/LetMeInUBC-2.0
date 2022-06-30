@@ -6,17 +6,7 @@ node_modules
 !postcss.config.js
 !tailwind.config.js
 
-!Dashboard.js
-!Landing.js
-!Modal.js
-!SideBar.js
-!Beta.js
-!Account.js
-!App.js
-!index.js
-
-
-!letmeinubc-react/*..js
+!letmeinubc-react/**/*.js
 
 .env
 .DS_Store
