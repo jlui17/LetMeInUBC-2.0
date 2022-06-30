@@ -11,6 +11,12 @@ node_modules
 !Modal.js
 !SideBar.js
 !Beta.js
+!Account.js
+!App.js
+!index.js
+
+
+!letmeinubc-react/*..js
 
 .env
 .DS_Store
