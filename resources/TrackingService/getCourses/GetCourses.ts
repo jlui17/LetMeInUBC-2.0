@@ -3,11 +3,11 @@ import { AttributeMap } from 'aws-sdk/clients/dynamodb';
 
 const COURSES_TABLE_NAME: string = process.env.COURSES_TABLE_NAME ? process.env.COURSES_TABLE_NAME : "";
 
-exports.handler = async (event: string[] ): Promise<AttributeMap[]> => {
+export const getCourses = async (courses: string[] ): Promise<AttributeMap[]> => {
     const db = new DynamoDB.DocumentClient();
-    const courseNames = event;
+    const courseNames = courses;
 
-    const courses: AttributeMap[] = [];
+    const fetchedCourses: AttributeMap[] = [];
 
     for (let i = 0; i < courseNames.length; i++) {
         const courseParams = {
@@ -25,8 +25,8 @@ exports.handler = async (event: string[] ): Promise<AttributeMap[]> => {
             return data;
         }).promise();
 
-        if (data.Item) courses.push(data.Item);
+        if (data.Item) fetchedCourses.push(data.Item);
     }
 
-    return courses;
+    return fetchedCourses;
 }

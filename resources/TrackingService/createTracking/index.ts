@@ -1,4 +1,8 @@
 import { Lambda } from 'aws-sdk';
+import { AttributeMap } from 'aws-sdk/clients/dynamodb';
+import getCourses from '../getCourses';
+import createCourse from '../createCourse';
+import { createTracking } from './CreateTracking';
 
 const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest): Promise<any> => {
   const invokeLambda = (params: Lambda.InvocationRequest) => {
@@ -16,29 +20,14 @@ const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest): Promise
   return JSON.parse(getDataFromLambdaResponse(response));
 };
 
-const CREATE_TRACKING_FUNCTION_NAME = process.env.CREATE_TRACKING_FUNCTION_NAME ? process.env.CREATE_TRACKING_FUNCTION_NAME : "";
-const GET_COURSE_FUNCTION_NAME = process.env.GET_COURSE_FUNCTION_NAME ? process.env.GET_COURSE_FUNCTION_NAME : "";
 const GET_COURSE_DATA_FUNCTION_NAME = process.env.GET_COURSE_DATA_FUNCTION_NAME ? process.env.GET_COURSE_DATA_FUNCTION_NAME : "";
-const CREATE_COURSE_FUNCTION_NAME = process.env.CREATE_COURSE_FUNCTION_NAME ? process.env.CREATE_COURSE_FUNCTION_NAME : "";
 
 exports.handler = async (event: any): Promise<any> => {
   const { department, section, number, session, email, restricted } = JSON.parse(event.body);
 
-  const getCourseParams: [string] = [`${session} ${department} ${number} ${section}`];
+  const getCoursesInput: [string] = [`${session} ${department} ${number} ${section}`];
 
-  const getCourseInvokeParams = {
-    FunctionName: GET_COURSE_FUNCTION_NAME,
-    Payload: Buffer.from(JSON.stringify(getCourseParams)),
-  }
-
-  const getCourseResponse: [{
-    department: string,
-    section: string,
-    number: string,
-    session: string,
-    title: string,
-    description: string,
-  }?] = await invokeLambdaAndGetData(getCourseInvokeParams);
+  const getCourseResponse: AttributeMap[] = await getCourses(getCoursesInput);
 
   if (getCourseResponse.length === 0) {
     const getCourseDataParams: {
@@ -76,7 +65,7 @@ exports.handler = async (event: any): Promise<any> => {
       };
     }
 
-    const createCourseParams: {
+    const createCourseInput: {
       department: string,
       section: string,
       number: string,
@@ -92,15 +81,11 @@ exports.handler = async (event: any): Promise<any> => {
       title: getCourseDataResponse.title || "",
     }
   
-    const createCourseInvokeParams = {
-      FunctionName: CREATE_COURSE_FUNCTION_NAME,
-      Payload: Buffer.from(JSON.stringify(createCourseParams)),
-    }
-
-    new Lambda().invoke(createCourseInvokeParams).send();
+    const createCourseResponse: boolean = await createCourse(createCourseInput);
+    if (createCourseResponse === false) console.log("Could not create course as part of tracking workflow.");
   }
 
-  const createTrackingParams: {
+  const createTrackingInput: {
     department: string,
     section: string,
     number: string,
@@ -116,12 +101,7 @@ exports.handler = async (event: any): Promise<any> => {
     restricted: restricted,
   }
 
-  const createTrackingInvokeParams = {
-    FunctionName: CREATE_TRACKING_FUNCTION_NAME,
-    Payload: Buffer.from(JSON.stringify(createTrackingParams)),
-  }
-
-  const createTrackingResponse: string = await invokeLambdaAndGetData(createTrackingInvokeParams);
+  const createTrackingResponse: boolean = await createTracking(createTrackingInput);
 
   return {
     statusCode: 201,

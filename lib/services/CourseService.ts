@@ -3,41 +3,19 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 
 export class CourseService extends Construct {
-  public readonly createHandler: lambda.Function;
   public readonly getEndpointHandler: lambda.Function;
-  public readonly getHandler: lambda.Function;
 
   constructor(scope: Construct, id: string, props: any) {
     super(scope, id);
-    const RESOURCE_FOLDER = lambda.Code.fromAsset('resources/CourseService');
+    const RESOURCE_FOLDER = 'resources/TrackingService';
 
-    this.createHandler = new lambda.Function(this, 'CreateCourseHandler', {
+    this.getEndpointHandler = new lambda.Function(this, 'GetCourseEndpointHandler', {
       runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'CreateCourse.handler',
-      code: RESOURCE_FOLDER,
-      environment: {
-        COURSES_TABLE_NAME: props.COURSES_TABLE_NAME,
-      }
-    });
-
-    this.getHandler = new lambda.Function(this, 'GetCourseHandler', {
-      runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'GetCourse.handler',
-      code: RESOURCE_FOLDER,
+      handler: 'index.handler',
+      code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}/getCourses`),
       environment: {
         COURSES_TABLE_NAME: props.COURSES_TABLE_NAME
       }
     });
-
-    this.getEndpointHandler = new lambda.Function(this, 'GetCourseEndpointHandler', {
-      runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'GetEndpointCourse.handler',
-      code: RESOURCE_FOLDER,
-      environment: {
-        GET_COURSE_FUNCTION_NAME: this.getHandler.functionName
-      }
-    });
-
-    this.getHandler.grantInvoke(this.getEndpointHandler);
   }
 }

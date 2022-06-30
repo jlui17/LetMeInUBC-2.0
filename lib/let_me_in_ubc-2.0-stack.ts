@@ -121,11 +121,10 @@ export class LetMeInUbc20Stack extends Stack {
     });
     const trackingService = new TrackingService(this, "TrackingService", {
       TRACKING_TABLE_NAME: trackingTable.tableName,
+      COURSES_TABLE_NAME: coursesTable.tableName,
       EMAIL_INDEX_NAME: "emailIndex",
       COURSE_INDEX_NAME: "courseIndex",
-      GET_COURSE_FUNCTION_NAME: courseService.getHandler.functionName,
-      GET_COURSE_DATA_FUNCTION_NAME: webService.getCourseDataHandler.functionName,
-      CREATE_COURSE_FUNCTION_NAME: courseService.createHandler.functionName,
+      GET_COURSE_DATA_FUNCTION_NAME: webService.getCourseDataHandler.functionName
     });
     const trackingRoute = api.root.addResource("tracking");
     trackingRoute.addMethod(
@@ -208,17 +207,15 @@ export class LetMeInUbc20Stack extends Stack {
       },
     });
 
-    coursesTable.grantWriteData(courseService.createHandler);
-    coursesTable.grantReadData(courseService.getHandler);
+    coursesTable.grantReadWriteData(trackingService.createEndpointHandler);
+    coursesTable.grantReadData(courseService.getEndpointHandler);
 
-    trackingTable.grantWriteData(trackingService.createHandler);
+    trackingTable.grantWriteData(trackingService.createEndpointHandler);
     trackingTable.grantReadData(trackingService.getByEmailHandler);
     trackingTable.grantReadData(trackingService.getByCourseHandler);
     trackingTable.grantReadData(trackingService.getByAllCoursesHandler);
     trackingTable.grantWriteData(trackingService.deleteHandler);
 
-    courseService.getHandler.grantInvoke(trackingService.createEndpointHandler);
-    courseService.createHandler.grantInvoke(trackingService.createEndpointHandler);
     webService.getCourseDataHandler.grantInvoke(trackingService.createEndpointHandler);
 
     trackingService.getByAllCoursesHandler.grantInvoke(refreshAndNotifyService.handler);

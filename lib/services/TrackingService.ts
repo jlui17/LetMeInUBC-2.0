@@ -4,7 +4,6 @@ import { Construct } from 'constructs';
 
 export class TrackingService extends Construct {
   public readonly createEndpointHandler: lambda.Function;
-  public readonly createHandler: lambda.Function;
   public readonly deleteEndpointHandler: lambda.Function;
   public readonly deleteHandler: lambda.Function;
   public readonly getEndpointHandler: lambda.Function;
@@ -14,12 +13,12 @@ export class TrackingService extends Construct {
 
   constructor(scope: Construct, id: string, props: any) {
     super(scope, id);
-    const RESOURCE_FOLDER = lambda.Code.fromAsset('resources/TrackingService');
+    const RESOURCE_FOLDER = 'resources/TrackingService';
 
     this.getByEmailHandler = new lambda.Function(this, 'GetTrackingByEmailHandler', {
       runtime: lambda.Runtime.NODEJS_14_X,
       handler: 'GetTrackingByEmail.handler',
-      code: RESOURCE_FOLDER,
+      code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}`),
       environment: {
         TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME,
         EMAIL_INDEX_NAME: props.EMAIL_INDEX_NAME
@@ -29,7 +28,7 @@ export class TrackingService extends Construct {
     this.getByCourseHandler = new lambda.Function(this, 'GetTrackingByCourseHandler', {
       runtime: lambda.Runtime.NODEJS_14_X,
       handler: 'GetTrackingByCourse.handler',
-      code: RESOURCE_FOLDER,
+      code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}`),
       environment: {
         TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME,
         COURSE_INDEX_NAME: props.COURSE_INDEX_NAME,
@@ -39,16 +38,7 @@ export class TrackingService extends Construct {
     this.getByAllCoursesHandler = new lambda.Function(this, 'GetTrackingByAllCoursesHandler', {
       runtime: lambda.Runtime.NODEJS_14_X,
       handler: 'GetTrackingByAllCourses.handler',
-      code: RESOURCE_FOLDER,
-      environment: {
-        TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME
-      }
-    });
-
-    this.createHandler = new lambda.Function(this, 'CreateTrackingHandler', {
-      runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'CreateTracking.handler',
-      code: RESOURCE_FOLDER,
+      code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}`),
       environment: {
         TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME
       }
@@ -56,20 +46,19 @@ export class TrackingService extends Construct {
 
     this.createEndpointHandler = new lambda.Function(this, 'CreateEndpointTrackingHandler', {
       runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'CreateEndpointTracking.handler',
-      code: RESOURCE_FOLDER,
+      handler: 'createTracking/index.handler',
+      code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}`),
       environment: {
-        CREATE_TRACKING_FUNCTION_NAME: this.createHandler.functionName,
-        GET_COURSE_FUNCTION_NAME: props.GET_COURSE_FUNCTION_NAME,
         GET_COURSE_DATA_FUNCTION_NAME: props.GET_COURSE_DATA_FUNCTION_NAME,
-        CREATE_COURSE_FUNCTION_NAME: props.CREATE_COURSE_FUNCTION_NAME,
+        TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME,
+        COURSES_TABLE_NAME: props.COURSES_TABLE_NAME
       }
     });
 
     this.deleteHandler = new lambda.Function(this, 'DeleteTrackingHandler', {
       runtime: lambda.Runtime.NODEJS_14_X,
       handler: 'DeleteTracking.handler',
-      code: RESOURCE_FOLDER,
+      code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}`),
       environment: {
         TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME
       }
@@ -78,7 +67,7 @@ export class TrackingService extends Construct {
     this.deleteEndpointHandler = new lambda.Function(this, 'DeleteEndpointTrackingHandler', {
       runtime: lambda.Runtime.NODEJS_14_X,
       handler: 'DeleteEndpointTracking.handler',
-      code: RESOURCE_FOLDER,
+      code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}`),
       environment: {
         DELETE_TRACKING_FUNCTION_NAME: this.deleteHandler.functionName
       }
@@ -87,7 +76,7 @@ export class TrackingService extends Construct {
     this.getEndpointHandler = new lambda.Function(this, 'GetEndpointTrackingHandler', {
       runtime: lambda.Runtime.NODEJS_14_X,
       handler: 'GetEndpointTracking.handler',
-      code: RESOURCE_FOLDER,
+      code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}`),
       environment: {
         getByEmailFunctionName: this.getByEmailHandler.functionName,
         getByCourseFunctionName: this.getByCourseHandler.functionName,
@@ -95,7 +84,6 @@ export class TrackingService extends Construct {
       }
     });
 
-    this.createHandler.grantInvoke(this.createEndpointHandler);
     this.getByAllCoursesHandler.grantInvoke(this.getEndpointHandler);
     this.getByCourseHandler.grantInvoke(this.getEndpointHandler);
     this.getByEmailHandler.grantInvoke(this.getEndpointHandler);

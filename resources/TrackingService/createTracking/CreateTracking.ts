@@ -1,6 +1,6 @@
 import { DynamoDB } from 'aws-sdk';
 
-interface createTrackingParams {
+interface createTrackingInput {
     session: string,
     email: string,
     department: string,
@@ -11,19 +11,21 @@ interface createTrackingParams {
 
 const TRACKING_TABLE_NAME: string = process.env.TRACKING_TABLE_NAME ? process.env.TRACKING_TABLE_NAME : "";
 
-exports.handler = async (event: createTrackingParams): Promise<any> => {
+export const createTracking = async (event: createTrackingInput): Promise<boolean> => {
     const db = new DynamoDB.DocumentClient();
     const { department, section, number, session, email, restricted } = event;
     const courseName = `${session} ${department} ${number} ${section}`
 
-    await db.put({
+    let response: boolean = true;
+
+    db.put({
         TableName: TRACKING_TABLE_NAME,
         Item: {
             courseName: courseName,
             email: email,
             includeRestrictedSeats: restricted,
         },
-    }).promise();
+    }).promise().catch(error => { response = false });
 
-    return `${email} is now tracking ${restricted === 'true' ? 'restricted' : 'general'} seating for ${courseName}`;
+    return response;
 }
