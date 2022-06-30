@@ -11,7 +11,7 @@ const getCourseName = function (courseDict: any) {
 
 const getCourseURL = function (courseDict: any) {
     const { session, department, number, section } = courseDict;
-    const year = parseInt(CURRENT_SCHOOL_YEAR) + (session == 'W' ? 0 : 1)
+    const year = parseInt(CURRENT_SCHOOL_YEAR);
     return `https://courses.students.ubc.ca/cs/courseschedule?sesscd=${session}&pname=subjarea&tname=subj-section&sessyr=${year}&dept=${department}&course=${number}&section=${section}`
 }
 

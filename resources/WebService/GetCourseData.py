@@ -48,7 +48,7 @@ def get_random_ua():
 def get_section_string(section_data, template="{} {} {} {} {}"):
     return template.format(
         section_data['session'],
-        CURRENT_SCHOOL_YEAR + (0 if section_data['session'] == 'W' else 1),
+        CURRENT_SCHOOL_YEAR,
         section_data['department'],
         section_data['number'],
         section_data['section']
