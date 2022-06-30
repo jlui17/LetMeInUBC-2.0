@@ -41,8 +41,16 @@ exports.handler = async (event: any): Promise<any> => {
     response = JSON.parse(response.Payload as string);
     const availableCourses: Array<CourseEntry> = response["availableCourses"];
     const invalidCourses: Array<{ course: CourseEntry, reason: string }> = response["invalidCourses"];
-    console.log(":: Available Courses: " + JSON.stringify(availableCourses));
-    console.log(":: Invalid Courses: " + JSON.stringify(invalidCourses));
+    const refreshFailedCourses: Array<CourseEntry> = response["refreshFailedCourses"];
+    if (availableCourses.length > 0) {
+      console.log(":: Available Courses: " + JSON.stringify(availableCourses));
+    }
+    if (invalidCourses.length > 0) {
+      console.log(":: Invalid Courses: " + JSON.stringify(invalidCourses));
+    }
+    if (refreshFailedCourses.length > 0) {
+      console.log(":: Refresh Failed Courses: " + JSON.stringify(refreshFailedCourses));
+    }
 
     const notifyArr: Array<{course: CourseEntry, emails: Array<string>}> = [];
     for (let course of availableCourses) {
@@ -63,7 +71,9 @@ exports.handler = async (event: any): Promise<any> => {
     }
 
     // notify then remove tracking
-    console.log(":: Notify Contacts: " + JSON.stringify(notifyArr))
+    if (notifyArr.length > 0) {
+      console.log(":: Notify Contacts: " + JSON.stringify(notifyArr))
+    }
     params = {
       FunctionName: NOTIFY_CONTACTS,
       InvocationType: "RequestResponse",
@@ -74,7 +84,9 @@ exports.handler = async (event: any): Promise<any> => {
     };
     response = await lambda.invoke(params).promise();
 
-    console.log(":: Remove Tracking");
+    if (notifyArr.length > 0) {
+      console.log(":: Remove Tracking");
+    }
     for (let entry of notifyArr) {
       for (let email of entry['emails']) {
         const queryParams = entry['course'];
@@ -91,7 +103,7 @@ exports.handler = async (event: any): Promise<any> => {
     }
 
     // invalid course handling
-    /* for (let invalidDict of invalidCourses) {
+    for (let invalidDict of invalidCourses) {
       const queryParams = invalidDict['course'];
       queryParams['restricted'] = 'false';
       params = {
@@ -115,7 +127,7 @@ exports.handler = async (event: any): Promise<any> => {
         console.log(":: Invalid tracking removed:" + JSON.stringify(queryParams));
         response = await lambda.invoke(params).promise();
       }
-    } */
+    }
 
     return notifyArr;
 }

@@ -73,6 +73,7 @@ def get_section_data(section):
 
     if not title or not description:
         if "no longer offered" in soup.text:
+            print(":: Invalid section {}".format(get_section_string(section)))
             raise InvalidSectionError()
 
         if "Sorry for" in soup.text:
@@ -82,7 +83,9 @@ def get_section_data(section):
         if "Out of Service" in soup.text or "The requested resource" in soup.text or "Please wait" in soup.text or "error has occurred" in soup.text:
             raise OutOfServiceException()
 
-        raise MissingAttributeException(str(soup))
+        raise MissingAttributeException()
+
+    print(":: Valid section {}".format(get_section_string(section)))
 
     section_data = {
         'title': title.text,

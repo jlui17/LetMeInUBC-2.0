@@ -48,6 +48,7 @@ const sendEmail = async function (emails: Array<string>, title: string, descript
     };
 
     const response = await transporter.sendMail(mailOptions);
+    console.log(":: Email response:");
     console.log(response);
 
     return response;
@@ -65,7 +66,9 @@ interface courseDict {
 
 exports.handler = async function (event: any) {
     const toNotify = event.data;
+    console.log(":: Input: " + JSON.stringify(toNotify));
     for (let notifyDict of toNotify) {
+        console.log(":: Notifying " + JSON.stringify(notifyDict) + "...");
         const emails: Array<string> = notifyDict["emails"];
         const courseDict: courseDict = notifyDict["course"];
 

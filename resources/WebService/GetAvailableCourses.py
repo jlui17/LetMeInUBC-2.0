@@ -105,9 +105,6 @@ def get_seat_summary(section_data):
     description = soup.find('h5')
     
     if not title or not description:
-        raise MissingAttributeException(soup.text)
-
-    if not soup.find('table', attrs={'class': '\'table'}):
         if "no longer offered" in soup.text:
             raise InvalidSectionError("Section does not exist")
 
@@ -144,6 +141,7 @@ def get_available_sections(sections):
 
     available_sections = []
     invalid_sections = []
+    refresh_failed_sections = []
 
     print(":: get_available_sections: Seat summaries")
 
@@ -167,7 +165,7 @@ def get_available_sections(sections):
                 'reason': e.args[0]
             })
         except OutOfServiceException:
-            pass
+            refresh_failed_sections.append(section)
         except MissingAttributeException as e:
             print(":: Unable to get info for " + get_section_string(section) + ", dumping soup...")
             print(str(e))
@@ -178,12 +176,15 @@ def get_available_sections(sections):
         time.sleep(PAUSE_BETWEEN_REQUESTS)
 
     if invalid_sections:
-        print(":: get_available_sections: Invalid section(s): " + str(invalid_sections))
-        pass
+        print(":: Invalid section(s): " + str(invalid_sections))
+        
+    if refresh_failed_sections:
+        print(":: Failed to refresh section(s): " + str(refresh_failed_sections))
 
     return { 
         'availableCourses': available_sections,
-        'invalidCourses': invalid_sections
+        'invalidCourses': invalid_sections,
+        'refreshFailedCourses': refresh_failed_sections
     }
 
 
