@@ -18,7 +18,7 @@ export const createTracking = async (event: createTrackingInput): Promise<boolea
 
     let response: boolean = true;
 
-    db.put({
+    await db.put({
         TableName: TRACKING_TABLE_NAME,
         Item: {
             courseName: courseName,
