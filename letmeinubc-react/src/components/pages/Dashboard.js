@@ -16,7 +16,7 @@ export default function Dashboard() {
                 UBC Course Tracker
               </h1>
 
-              <div className="inline-flex ">
+              <div className="flex justify-between">
                 <span className="text-2xl font-sans font-bold inline-flex">
                   My tracked courses
                 </span>
