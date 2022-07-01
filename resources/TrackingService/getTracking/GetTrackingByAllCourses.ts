@@ -2,7 +2,7 @@ import { DynamoDB } from 'aws-sdk';
 
 const TRACKING_TABLE_NAME: string = process.env.TRACKING_TABLE_NAME ? process.env.TRACKING_TABLE_NAME : "";
 
-exports.handler = async (): Promise<any> => {
+export const getTrackingByAllCourses = async (): Promise<any> => {
     const db = new DynamoDB.DocumentClient();
 
     const courseTrackingParams = {
@@ -22,3 +22,5 @@ exports.handler = async (): Promise<any> => {
 
     return uniqueAllCourses;
 }
+
+exports.handler = getTrackingByAllCourses;

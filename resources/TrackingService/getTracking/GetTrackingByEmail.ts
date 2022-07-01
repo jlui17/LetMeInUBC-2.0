@@ -7,7 +7,7 @@ interface GetTrackingByEmailParams {
     email: string
 }
 
-exports.handler = async (event: GetTrackingByEmailParams): Promise<any> => {
+export const getTrackingByEmail = async (event: GetTrackingByEmailParams): Promise<any> => {
     const db = new DynamoDB.DocumentClient();
     const { email } = event;
 

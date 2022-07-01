@@ -11,7 +11,7 @@ interface GetTrackingByCourseParams {
     restricted: string,
 }
 
-exports.handler = async (event: GetTrackingByCourseParams): Promise<any> => {
+export const getTrackingByCourse = async (event: GetTrackingByCourseParams): Promise<any> => {
     const db = new DynamoDB.DocumentClient();
     const { department, section, number, session, restricted } = event;
     const courseName = `${session} ${department} ${number} ${section}`
@@ -47,3 +47,5 @@ exports.handler = async (event: GetTrackingByCourseParams): Promise<any> => {
 
     return emails;
 }
+
+exports.handler = getTrackingByCourse;

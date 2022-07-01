@@ -7,42 +7,12 @@ export class TrackingService extends Construct {
   public readonly deleteEndpointHandler: lambda.Function;
   public readonly deleteHandler: lambda.Function;
   public readonly getEndpointHandler: lambda.Function;
-  public readonly getByEmailHandler: lambda.Function;
   public readonly getByCourseHandler: lambda.Function;
   public readonly getByAllCoursesHandler: lambda.Function;
 
   constructor(scope: Construct, id: string, props: any) {
     super(scope, id);
     const RESOURCE_FOLDER = 'resources/TrackingService';
-
-    this.getByEmailHandler = new lambda.Function(this, 'GetTrackingByEmailHandler', {
-      runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'GetTrackingByEmail.handler',
-      code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}`),
-      environment: {
-        TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME,
-        EMAIL_INDEX_NAME: props.EMAIL_INDEX_NAME
-      }
-    });
-
-    this.getByCourseHandler = new lambda.Function(this, 'GetTrackingByCourseHandler', {
-      runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'GetTrackingByCourse.handler',
-      code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}`),
-      environment: {
-        TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME,
-        COURSE_INDEX_NAME: props.COURSE_INDEX_NAME,
-      }
-    });
-
-    this.getByAllCoursesHandler = new lambda.Function(this, 'GetTrackingByAllCoursesHandler', {
-      runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'GetTrackingByAllCourses.handler',
-      code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}`),
-      environment: {
-        TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME
-      }
-    });
 
     this.createEndpointHandler = new lambda.Function(this, 'CreateEndpointTrackingHandler', {
       runtime: lambda.Runtime.NODEJS_14_X,
@@ -75,18 +45,34 @@ export class TrackingService extends Construct {
 
     this.getEndpointHandler = new lambda.Function(this, 'GetEndpointTrackingHandler', {
       runtime: lambda.Runtime.NODEJS_14_X,
-      handler: 'GetEndpointTracking.handler',
-      code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}`),
+      handler: 'index.handler',
+      code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}/getTracking`),
       environment: {
-        getByEmailFunctionName: this.getByEmailHandler.functionName,
-        getByCourseFunctionName: this.getByCourseHandler.functionName,
-        getByAllCoursesFunctionName: this.getByAllCoursesHandler.functionName,
+        TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME,
+        EMAIL_INDEX_NAME: props.EMAIL_INDEX_NAME,
+        COURSE_INDEX_NAME: props.COURSE_INDEX_NAME
       }
     });
 
-    this.getByAllCoursesHandler.grantInvoke(this.getEndpointHandler);
-    this.getByCourseHandler.grantInvoke(this.getEndpointHandler);
-    this.getByEmailHandler.grantInvoke(this.getEndpointHandler);
+    this.getByCourseHandler = new lambda.Function(this, 'GetTrackingByCourseHandler', {
+      runtime: lambda.Runtime.NODEJS_14_X,
+      handler: 'GetTrackingByCourse.handler',
+      code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}/getTracking`),
+      environment: {
+        TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME,
+        COURSE_INDEX_NAME: props.COURSE_INDEX_NAME,
+      }
+    });
+
+    this.getByAllCoursesHandler = new lambda.Function(this, 'GetTrackingByAllCoursesHandler', {
+      runtime: lambda.Runtime.NODEJS_14_X,
+      handler: 'GetTrackingByAllCourses.handler',
+      code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}/getTracking`),
+      environment: {
+        TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME
+      }
+    });
+
     this.deleteHandler.grantInvoke(this.deleteEndpointHandler);
   }
 }

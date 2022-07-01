@@ -211,7 +211,7 @@ export class LetMeInUbc20Stack extends Stack {
     coursesTable.grantReadData(courseService.getEndpointHandler);
 
     trackingTable.grantWriteData(trackingService.createEndpointHandler);
-    trackingTable.grantReadData(trackingService.getByEmailHandler);
+    trackingTable.grantReadData(trackingService.getEndpointHandler);
     trackingTable.grantReadData(trackingService.getByCourseHandler);
     trackingTable.grantReadData(trackingService.getByAllCoursesHandler);
     trackingTable.grantWriteData(trackingService.deleteHandler);
