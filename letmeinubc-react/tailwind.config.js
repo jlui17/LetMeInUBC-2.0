@@ -9,9 +9,9 @@ module.exports = {
   theme: {
     borderRadius: {
       xl: "30px",
-      "md": "0.375rem",
-      "lg": "0.5rem",
-      "xlg": "0.75rem",
+      md: "0.375rem",
+      lg: "0.5rem",
+      xlg: "0.75rem",
       "2xl": "1rem",
     },
     extend: {
@@ -20,12 +20,16 @@ module.exports = {
         "almost-screen": "80vh",
         "half-screen": "50vh",
         f20: "20%",
+        n2: "-12px",
       },
       colors: {
         "ubc-blue": "#002145",
         "ubc-grey": "#888888",
         "cool-blue": "#071547",
         "highlight-blue": "#273250",
+      },
+      gridTemplateColumns: {
+        14: "repeat(14, minmax(1fr))",
       },
     },
   },

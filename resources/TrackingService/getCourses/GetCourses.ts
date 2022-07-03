@@ -15,7 +15,7 @@ export const getCourses = async (courses: string[] ): Promise<AttributeMap[]> =>
             Key: {
                 courseName: courseNames[i]
             },
-            AttributesToGet: ["session", "department", "number", "section", "title", "description"],
+            AttributesToGet: ["session", "department", "number", "section", "title", "description", "courseName"],
         };
     
         const data = await db.get(courseParams, (error: any, data: any) => {

@@ -4,6 +4,6 @@ import Beta from "./Beta";
 import App from "./App";
 import "./index.css";
 
-ReactDOM.render(<Beta />, document.getElementById("root"));
+ReactDOM.render(<App />, document.getElementById("root"));
 
 

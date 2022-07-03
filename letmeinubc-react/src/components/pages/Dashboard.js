@@ -1,69 +1,490 @@
-import React from "react";
+import { React, useState, useEffect, Fragment } from "react";
 import SideBar from "../SideBar";
+import jwt_decode from "jwt-decode";
+import { Dialog, Transition } from "@headlessui/react";
 
-export default function Dashboard() {
+export default function Dashboard(token) {
+  const [open, setOpen] = useState(false);
+  const [courses, setCourses] = useState([]);
+  const [courseList, setCourseList] = useState([]);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+    const [courseLoading, setCourseLoading] = useState(false);
+
+
+  // Keeps watch of current user's courses. [courses] is a list of users courses from latest get call.
+    useEffect(() => {
+      setCourseLoading(true);
+        if (courses != []) {
+      const courseNames = courses.map((course) => course.substring(course.indexOf(' ') + 1));
+      const courseDetail = fetch(
+        `https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/courses?courses=${courses}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            Authorization: tokenLogin,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          trackedCourses = data;
+          handleUpdateList(data);
+        });
+    } else {
+      handleUpdateList([]);
+    }
+  }, [courses]);
+
+  // Variables needed for API call
+  let trackedCourses;
+  let tokenLogin;
+
+  // Redirect to login if token is not found
+  function login() {
+    window.location.replace(
+      "https://letmeinubc.auth.us-west-2.amazoncognito.com/login?client_id=2shgpu14nnj4ulipe5ui6ja6b7&response_type=token&scope=openid&redirect_uri=https://dxi81lck7ldij.cloudfront.net/"
+    );
+    return null;
+  }
+
+
+  // Get token from URL, if token is not found, button to redirect to login
+  try {
+    // tokenLogin = window.location.href.split("=")[1].split("&"[0])[0];
+      tokenLogin = token;
+    getCourses(tokenLogin);
+  } catch (e) {
     return (
-      <>
-        <div className="flex my-10 mx-10 h-almost-screen">
-          <div className="basis-f20 rounded-l-xl bg-cool-blue">
-            <SideBar />
+      <div>
+        <button
+          className="inline-flex justify-center py-2 px-4 mr-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
+          onClick={login}
+        >
+          Login
+        </button>
+      </div>
+    );
+  }
+
+  // Updates Dashboard courses list
+    const handleUpdateList = (courses) => {
+      console.log(courses);
+    setCourseList(
+      courses.map((course) => (
+        <li
+          className="text-lg font-medium font-sans text-gray-700 hover:outline hover:outline-1 py-2 my-2 mx-2 rounded-lg"
+          key={course.title}
+        >
+          <label
+            className="form-check-label text-gray-800 grid grid-cols-12"
+            for="delete"
+          >
+            <input
+              className="col-span-1 form-check-input appearance-none ml-2 h-5 w-5 border rounded-md border-ubc-grey bg-white checked:bg-ubc-blue focus:outline-none transition duration-200 mt-1 align-baseline bg-no-repeat bg-center bg-contain float-left cursor-pointer"
+              type="checkbox"
+              value=""
+              id={
+                course.department +
+                " " +
+                course.number +
+                " " +
+                course.section +
+                " " +
+                course.session
+              }
+            />
+            <span className="col-span-1">{course.department}</span>
+            <span className="col-span-1 pl-2">{course.number}</span>
+            <span className="col-span-1 pl-2">{course.section}</span>
+            <span className="col-span-1 pl-3">{course.session}</span>
+            <span className="col-span-2">
+              {course.restricted === "true"
+                ? "Restricted + General"
+                : "General Only"}
+            </span>
+            <span className=" col-span-5">{course.description}</span>
+          </label>
+        </li>
+      ))
+    );
+    setCourseLoading(false);
+  };
+
+  // API call to get user's courses from dynamodb based on email. Updates [courses] with returned data - this will trigger handleUpdateList.
+  async function getCourses(token) {
+    const getCourse = fetch(
+      `https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/tracking?key=email&email=${
+        jwt_decode(token).email
+      }`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: token,
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        trackedCourses = data;
+        if (data === []) {
+          setCourses([]);
+        } else {
+           
+           
+            setCourses(trackedCourses?.map((course) => (course.restricted + " " + course.name)).join(","));
+            console.log(courses)
+        }
+      });
+  }
+
+  // API call to add course to tracking table
+  const recordTracking = async (e, info) => {
+    setSubmitLoading(true);
+    e.preventDefault();
+    console.log(tokenLogin);
+
+    const restricted = info.restricted ? "true" : "false";
+    const session = info.session === "Winter" ? "W" : "S";
+    const email = jwt_decode(tokenLogin).email;
+
+    const response = await fetch(
+      "https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/tracking",
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Authorization: tokenLogin,
+        },
+        body: JSON.stringify({
+          session: session,
+          department: info.department,
+          number: info.course_number,
+          section: info.section,
+          email: email,
+          restricted: restricted,
+        }),
+      }
+    ).then((response) => {
+      if (response.status === 404) {
+        alert("Invalid Course Specified");
+      }
+    });
+
+    getCourses(tokenLogin);
+    setSubmitLoading(false);
+    setOpen(false);
+
+    return 200;
+  };
+
+  // API call to delete course from tracking table
+  async function deleteSelectedTracking() {
+    setDeleteLoading(true);
+    var items = document.querySelectorAll("input[type=checkbox]:checked");
+    for (var i = 0; i < items.length; i++) {
+      console.log(items[i].id.replace(/\s+/g, " ").trim().split(" "));
+      let deleteArray = items[i].id.replace(/\s+/g, " ").trim().split(" ");
+      const response = await fetch(
+        "https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/tracking",
+        {
+          method: "DELETE",
+          headers: {
+            Accept: "application/json",
+            Authorization: tokenLogin,
+          },
+          body: JSON.stringify({
+            session: deleteArray[3],
+            department: deleteArray[0],
+            number: deleteArray[1],
+            section: deleteArray[2],
+            email: jwt_decode(tokenLogin).email,
+          }),
+        }
+      );
+    }
+    setDeleteLoading(false);
+    setCourseLoading(true);
+    getCourses(tokenLogin);
+  }
+
+  function trim(myString) {
+    return myString.replace(/^\s+|\s+$/g, "");
+  }
+
+  return (
+    <>
+      {" "}
+      <Transition.Root show={open} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={setOpen}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          </Transition.Child>
+
+          <div className="fixed z-10 inset-0 overflow-y-auto">
+            <div className="flex items-end sm:items-center justify-center min-h-full p-4 text-center sm:p-0">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                enterTo="opacity-100 translate-y-0 sm:scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              >
+                <Dialog.Panel className="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full">
+                  <div className="mt-5 md:mt-0 md:col-span-2">
+                    <form>
+                      <div className="shadow overflow-hidden sm:rounded-md">
+                        <div className="px-4 py-5 bg-white sm:p-6">
+                          <div className="grid grid-cols-6 gap-6">
+                            <div className="col-span-6 sm:col-span-3 py-2">
+                              <label
+                                htmlFor="department"
+                                className="block text-lg font-medium font-sans text-gray-700"
+                              >
+                                Department
+                              </label>
+                              <input
+                                type="text"
+                                name="department"
+                                id="department"
+                                placeholder="CPSC"
+                                className="uppercase mt-1 h-10 pl-1 focus:ring-indigo-500 focus:border-inido-500 block w-full shawdow-sm sm:text-base border-gray-300 rounded-md"
+                              />
+                            </div>
+
+                            <div className="col-span-6 sm:col-span-3 py-2">
+                              <label
+                                htmlFor="course-number"
+                                className="block text-lg font-medium font-sans text-gray-700"
+                              >
+                                Course Number
+                              </label>
+                              <input
+                                type="text"
+                                name="course-number"
+                                id="course-number"
+                                placeholder="340"
+                                className="uppercase mt-1 h-10 pl-1 focus:ring-indigo-500 focus:border-inido-500 block w-full shawdow-sm sm:text-base border-gray-300 rounded-md"
+                              />
+                            </div>
+                          </div>
+                          <div className="col-span-6 sm:col-span-4 py-2">
+                            <label
+                              htmlFor="section"
+                              className="block text-lg font-medium text-gray-700"
+                            >
+                              Section
+                            </label>
+                            <input
+                              type="text"
+                              name="section"
+                              id="section"
+                              placeholder="101"
+                              className="uppercase mt-1 h-10 pl-1 font-sans focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-lg border-gray-300 rounded-md"
+                            />
+                          </div>
+                          <div className="col-span-6 sm:col-span-3 py-2">
+                            <label
+                              htmlFor="session"
+                              className="h-10 pl-1block text-lg font-medium text-gray-700"
+                            >
+                              Session
+                            </label>
+                            <select
+                              name="session"
+                              id="session"
+                              className="h-10 pl-1 mt-1 block w-full py2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg"
+                            >
+                              <option>Winter</option>
+                              <option>Summer</option>
+                            </select>
+                          </div>
+                          <div className="col-span-6 sm:col-span-3 py-2">
+                            <label
+                              htmlFor="session"
+                              className="h-10 pl-1block text-lg font-medium text-gray-700"
+                            >
+                              General Seats Only
+                            </label>
+                            <input
+                              className="form-check-input appearance-none h-5 w-5 border rounded-md border-ubc-grey bg-white checked:bg-ubc-blue focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer"
+                              type="checkbox"
+                              name="restricted"
+                              id="restricted"
+                            />
+                          </div>
+                          <div className="px-4 py-3 mt-4 bg-ubc-grey-50 text-right sm:px-6">
+                            <button
+                              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                              onClick={async (e) => {
+                                let res = await recordTracking(e, {
+                                  department: trim(
+                                    document
+                                      .getElementById("department")
+                                      .value.toUpperCase()
+                                  ),
+                                  course_number: trim(
+                                    document
+                                      .getElementById("course-number")
+                                      .value.toUpperCase()
+                                  ),
+                                  section: trim(
+                                    document
+                                      .getElementById("section")
+                                      .value.toUpperCase()
+                                  ),
+                                  session:
+                                    document.getElementById("session").value,
+                                  restricted:
+                                    document.getElementById("restricted")
+                                      .checked,
+                                });
+                              }}
+                              disabled={submitLoading}
+                            >
+                              {submitLoading && (
+                                <span className="text-lg font-lg font-sans text-white">
+                                  Submitting...
+                                </span>
+                              )}
+                              {!submitLoading && (
+                                <span className="text-lg font-lg font-sans text-white">
+                                  Submit
+                                </span>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
           </div>
+        </Dialog>
+      </Transition.Root>
+      <div className="flex my-10 mx-10 h-almost-screen">
+        <div className="basis-f20 rounded-l-xl bg-cool-blue">
+          <SideBar />
+        </div>
 
-          <div className="basis-5/6 md:grid md:grid-cols-5 bg-white rounded-r-xl">
-            <div className="mt-5 md:mt-0 md:col-span-3 ml-20">
-              <h1 className="text-5xl font-bold font-sans text-black my-16">
-                {" "}
-                UBC Course Tracker
-              </h1>
+        <div className="basis-5/6 md:grid md:grid-cols-5 bg-white rounded-r-xl">
+          <div className="mt-5 md:mt-0 md:col-span-4 ml-20">
+            <h1 className="text-5xl font-bold font-sans text-black my-16">
+              {" "}
+              UBC Course Tracker
+            </h1>
 
-              <div className="flex justify-between">
-                <span className="text-2xl font-sans font-bold inline-flex">
-                  My tracked courses
-                </span>
+            <div className="flex justify-between">
+              <span className="text-2xl font-sans font-bold inline-block">
+                My tracked courses
+              </span>
+              <div className="inline-block mb-2">
                 <button
-                  className="inline-flex justify-center py-2 px-4 mr-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  // onClick={deleteSelectedTracking}
-                  // disabled={deleteLoading}
+                  className="inline-flex justify-center py-2 px-2 mr-1 border-solid border-ubc-blue border-2 shadow-sm text-lg font-sans font-lg rounded-md text-white hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={deleteSelectedTracking}
+                  disabled={deleteLoading}
                 >
-                  <span className="text-lg font-lg font-sans text-white">
-                    Delete
-                  </span>
+                  {!deleteLoading && (
+                    <span className="text-lg font-lg font-sans text-white">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="#002145"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </span>
+                  )}
+                  {deleteLoading && (
+                    <svg
+                      role="status"
+                      class="w-5 h-5 text-gray-200 animate-spin dark:text-ubc-grey fill-ubc-blue"
+                      viewBox="0 0 100 101"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                        fill="currentColor"
+                      ></path>
+                      <path
+                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                        fill="currentFill"
+                      ></path>
+                    </svg>
+                  )}
                 </button>
                 <button
-                  className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
-                  // onClick={() => setOpen(true)}
+                  className="inline-flex justify-center py-2 px-2 border-solid border-ubc-blue border-2 shadow-sm text-lg font-sans font-lg rounded-md text-white hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
+                  onClick={() => setOpen(true)}
                 >
-                  Add Course
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="#002145"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                 </button>
               </div>
+            </div>
 
-              <div className="shadow overflow-hidden sm:rounded-md border-ubc-blue border-solid border-2">
-                <div className="px-4 py-5 bg-white sm:p-6">
-                  <div className="">
-                    <ul className="max-h-80 ml-4 mt-4 overflow-auto overflow-y-scroll border-red-800">
-                      {/* {courseList} */}
-                    </ul>
-                  </div>
-
-                  <div className="px-4 py-3 mt-4 bg-ubc-grey-50 text-right sm:px-6">
-                    <button
-                      className="inline-flex justify-center py-2 px-4 mr-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
-                      // onClick={deleteSelectedTracking}
-                    >
-                      Delete
-                    </button>
-                    <button
-                      className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
-                      // onClick={() => setOpen(true)}
-                    >
-                      Add Course
-                    </button>
-                  </div>
+            <div className="shadow overflow-hidden sm:rounded-md border-ubc-blue border-solid border-2">
+              <div className="px-4 py-5 bg-white sm:p-6">
+                <div className="">
+                  <ul className="max-h-80 min-h-full overflow-auto overflow-y-scroll">
+                    {courseList}
+                    {courseLoading && (
+                      <svg
+                        role="status"
+                        class="w-5 h-5 ml-4 mt-3 text-gray-200 animate-spin dark:text-ubc-grey fill-ubc-blue"
+                        viewBox="0 0 100 101"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                          fill="currentColor"
+                        ></path>
+                        <path
+                          d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                          fill="currentFill"
+                        ></path>
+                      </svg>
+                    )}
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </>
-    );
+      </div>
+    </>
+  );
 }
