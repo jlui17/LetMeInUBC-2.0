@@ -17,7 +17,12 @@ export const getTrackingByEmail = async (event: GetTrackingByEmailParams): Promi
         ExpressionAttributeValues: {
             ":email": email
         },
-        ProjectionExpression: "courseName, includeRestrictedSeats",
+        ExpressionAttributeNames: {
+            "#dynamo_section": "section",
+            "#dynamo_number": "number",
+            "#dynamo_session": "session"
+        },
+        ProjectionExpression: "courseName, includeRestrictedSeats, department, description, #dynamo_section, #dynamo_number, #dynamo_session",
         KeyConditionExpression: "email = :email"
     }
 
@@ -27,7 +32,15 @@ export const getTrackingByEmail = async (event: GetTrackingByEmailParams): Promi
         return data;
     }).promise();
 
-    const courses = data.Items?.map(course => ({ name: course.courseName, restricted: course.includeRestrictedSeats }));
+    const courses = data.Items?.map(course => ({ 
+        name: course.courseName, 
+        restricted: course.includeRestrictedSeats, 
+        department: course.department, 
+        description: course.description, 
+        section: course.section, 
+        number: course.number, 
+        session: course.session 
+    }));
 
     return courses;
 }
