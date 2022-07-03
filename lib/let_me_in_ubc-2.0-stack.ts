@@ -17,7 +17,6 @@ import {
   CfnUserPoolResourceServer,
 } from "aws-cdk-lib/aws-cognito";
 
-import { CourseService } from "./services/CourseService";
 import { TrackingService } from "./services/TrackingService";
 import { WebService } from "./services/WebService";
 import { NotifyService } from "./services/NotifyService";
@@ -84,22 +83,6 @@ export class LetMeInUbc20Stack extends Stack {
       }
     );
 
-    const coursesTable = new dynamodb.Table(this, "Courses", {
-      partitionKey: { name: "courseName", type: dynamodb.AttributeType.STRING },
-    });
-    const courseService = new CourseService(this, "CourseService", {
-      COURSES_TABLE_NAME: coursesTable.tableName
-    });
-    const coursesRoute = api.root.addResource("courses");
-    coursesRoute.addMethod(
-      "GET",
-      new apigateway.LambdaIntegration(courseService.getEndpointHandler),
-      {
-        authorizer,
-        authorizationType: AuthorizationType.COGNITO,
-      }
-    );
-
     const webService = new WebService(this, "WebService", {
       CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR,
       PAUSE_BETWEEN_REQUESTS: PAUSE_BETWEEN_REQUESTS,
@@ -121,7 +104,6 @@ export class LetMeInUbc20Stack extends Stack {
     });
     const trackingService = new TrackingService(this, "TrackingService", {
       TRACKING_TABLE_NAME: trackingTable.tableName,
-      COURSES_TABLE_NAME: coursesTable.tableName,
       EMAIL_INDEX_NAME: "emailIndex",
       COURSE_INDEX_NAME: "courseIndex",
       GET_COURSE_DATA_FUNCTION_NAME: webService.getCourseDataHandler.functionName
@@ -206,9 +188,6 @@ export class LetMeInUbc20Stack extends Stack {
         domainPrefix: "letmeinubc",
       },
     });
-
-    coursesTable.grantReadWriteData(trackingService.createEndpointHandler);
-    coursesTable.grantReadData(courseService.getEndpointHandler);
 
     trackingTable.grantWriteData(trackingService.createEndpointHandler);
     trackingTable.grantReadData(trackingService.getEndpointHandler);
