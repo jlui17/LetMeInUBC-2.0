@@ -59,6 +59,7 @@ exports.handler = async (event: any): Promise<any> => {
     session: session,
     email: email,
     restricted: restricted,
+    description: getCourseDataResponse.description || ''
   }
 
   const createTrackingResponse: boolean = await createTracking(createTrackingInput);
