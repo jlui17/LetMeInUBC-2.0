@@ -1,7 +1,4 @@
 import { Lambda } from 'aws-sdk';
-import { AttributeMap } from 'aws-sdk/clients/dynamodb';
-import getCourses from '../getCourses';
-import createCourse from '../createCourse';
 import { createTracking } from './CreateTracking';
 
 const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest): Promise<any> => {
@@ -25,74 +22,37 @@ const GET_COURSE_DATA_FUNCTION_NAME = process.env.GET_COURSE_DATA_FUNCTION_NAME 
 exports.handler = async (event: any): Promise<any> => {
   const { department, section, number, session, email, restricted } = JSON.parse(event.body);
 
-  const getCoursesInput: [string] = [`${session} ${department} ${number} ${section}`];
-
-  const getCourseResponse: AttributeMap[] = await getCourses(getCoursesInput);
-
-  if (getCourseResponse.length === 0) {
-    const getCourseDataParams: {
-      department: string,
-      section: string,
-      number: string,
-      session: string
-    } = {
-      department: department,
-      section: section,
-      number: number,
-      session: session
-    }
-  
-    const getCourseDataInvokeParams = {
-      FunctionName: GET_COURSE_DATA_FUNCTION_NAME,
-      Payload: Buffer.from(JSON.stringify(getCourseDataParams)),
-    }
-
-    const getCourseDataResponse: {
-      department?: string,
-      section?: string,
-      number?: string,
-      session?: string,
-      title?: string,
-      description?: string,
-      error?: string,
-    } = await invokeLambdaAndGetData(getCourseDataInvokeParams);
-
-    if (getCourseDataResponse.error) {
-      return {
-        statusCode: 404,
-        headers: { "Access-Control-Allow-Origin": "*" },
-        body: getCourseDataResponse.error,
-      };
-    }
-
-    const createCourseInput: {
-      department: string,
-      section: string,
-      number: string,
-      session: string,
-      description: string,
-      title: string,
-    } = {
-      department: getCourseDataResponse.department || "",
-      section: getCourseDataResponse.section || "",
-      number: getCourseDataResponse.number || "",
-      session: getCourseDataResponse.session || "",
-      description: getCourseDataResponse.description || "",
-      title: getCourseDataResponse.title || "",
-    }
-  
-    const createCourseResponse: boolean = await createCourse(createCourseInput);
-    if (createCourseResponse === false) console.log("Could not create course as part of tracking workflow.");
+  const getCourseDataParams = {
+    department: department,
+    section: section,
+    number: number,
+    session: session
   }
 
-  const createTrackingInput: {
-    department: string,
-    section: string,
-    number: string,
-    session: string,
-    email: string,
-    restricted: string,
-  } = {
+  const getCourseDataInvokeParams = {
+    FunctionName: GET_COURSE_DATA_FUNCTION_NAME,
+    Payload: Buffer.from(JSON.stringify(getCourseDataParams)),
+  }
+
+  const getCourseDataResponse: {
+    department?: string,
+    section?: string,
+    number?: string,
+    session?: string,
+    title?: string,
+    description?: string,
+    error?: string,
+  } = await invokeLambdaAndGetData(getCourseDataInvokeParams);
+
+  if (getCourseDataResponse.error) {
+    return {
+      statusCode: 404,
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: getCourseDataResponse.error,
+    };
+  }
+
+  const createTrackingInput = {
     department: department,
     section: section,
     number: number,
@@ -102,6 +62,12 @@ exports.handler = async (event: any): Promise<any> => {
   }
 
   const createTrackingResponse: boolean = await createTracking(createTrackingInput);
+
+  if (createTrackingResponse === false) return {
+    statusCode: 500,
+    headers: { "Access-Control-Allow-Origin": "*" },
+    body: "An error has occurred while creating the tracking entry in our table."
+  }
 
   return {
     statusCode: 201,
