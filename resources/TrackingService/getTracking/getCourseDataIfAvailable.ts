@@ -1,21 +1,14 @@
 import { DynamoDB } from 'aws-sdk';
 
 const TRACKING_TABLE_NAME: string = process.env.TRACKING_TABLE_NAME ? process.env.TRACKING_TABLE_NAME : "";
-const EMAIL_INDEX_NAME: string = process.env.EMAIL_INDEX_NAME ? process.env.EMAIL_INDEX_NAME : "";
 
-interface GetTrackingByEmailParams {
-    email: string
-}
-
-export const getTrackingByEmail = async (event: GetTrackingByEmailParams): Promise<any> => {
+export const getCourseDataIfAvailable = async (courseName: string) => {
     const db = new DynamoDB.DocumentClient();
-    const { email } = event;
 
     const courseTrackingParams = {
         TableName: TRACKING_TABLE_NAME,
-        IndexName: EMAIL_INDEX_NAME,
         ExpressionAttributeValues: {
-            ":email": email
+            ":courseName": courseName
         },
         ExpressionAttributeNames: {
             "#dynamo_section": "section",
@@ -23,7 +16,7 @@ export const getTrackingByEmail = async (event: GetTrackingByEmailParams): Promi
             "#dynamo_session": "session"
         },
         ProjectionExpression: "courseName, includeRestrictedSeats, department, description, #dynamo_section, #dynamo_number, #dynamo_session",
-        KeyConditionExpression: "email = :email"
+        KeyConditionExpression: "courseName = :courseName"
     }
 
     const data = await db.query(courseTrackingParams, (error: any, data: any) => {
@@ -32,9 +25,7 @@ export const getTrackingByEmail = async (event: GetTrackingByEmailParams): Promi
         return data;
     }).promise();
 
-    const courses = data.Items?.map(course => ({ 
-        name: course.courseName, 
-        restricted: course.includeRestrictedSeats, 
+    const courses = data.Items?.map(course => ({
         department: course.department, 
         description: course.description, 
         section: course.section, 
