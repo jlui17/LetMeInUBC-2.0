@@ -25,7 +25,7 @@ function SideBar() {
                   className={({ isActive }) =>
                     isActive ? setDashboard(true) : setDashboard(false)
                   }
-                  to="/"
+                  to="/dashboard"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
