@@ -27,6 +27,7 @@ module.exports = {
         "ubc-grey": "#888888",
         "cool-blue": "#071547",
         "highlight-blue": "#273250",
+        
       },
       gridTemplateColumns: {
         14: "repeat(14, minmax(1fr))",

@@ -3,121 +3,74 @@ import SideBar from "../SideBar";
 import jwt_decode from "jwt-decode";
 import { Dialog, Transition } from "@headlessui/react";
 
-export default function Dashboard(token) {
+export default function Dashboard(loginToken) {
   const [open, setOpen] = useState(false);
   const [courses, setCourses] = useState([]);
   const [courseList, setCourseList] = useState([]);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
-    const [courseLoading, setCourseLoading] = useState(false);
+  const [courseLoading, setCourseLoading] = useState(false);
+    const [token, setToken] = useState("");
+    
 
+  useEffect(() => {
+    setToken(loginToken.loginToken);
+  }, []);
 
-  // Keeps watch of current user's courses. [courses] is a list of users courses from latest get call.
+  useEffect(() => {
+    getCourses();
+  }, [token]);
+
     useEffect(() => {
-      setCourseLoading(true);
-        if (courses != []) {
-      const courseNames = courses.map((course) => course.substring(course.indexOf(' ') + 1));
-      const courseDetail = fetch(
-        `https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/courses?courses=${courses}`,
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            Authorization: tokenLogin,
-          },
-        }
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          trackedCourses = data;
-          handleUpdateList(data);
-        });
-    } else {
-      handleUpdateList([]);
-    }
-  }, [courses]);
+      console.log("chnage")
+    handleUpdateList(courses);
+  }, [ courses]);
 
-  // Variables needed for API call
-  let trackedCourses;
-  let tokenLogin;
-
-  // Redirect to login if token is not found
-  function login() {
-    window.location.replace(
-      "https://letmeinubc.auth.us-west-2.amazoncognito.com/login?client_id=2shgpu14nnj4ulipe5ui6ja6b7&response_type=token&scope=openid&redirect_uri=https://dxi81lck7ldij.cloudfront.net/"
-    );
-    return null;
-  }
-
-
-  // Get token from URL, if token is not found, button to redirect to login
-  try {
-    // tokenLogin = window.location.href.split("=")[1].split("&"[0])[0];
-      tokenLogin = token;
-    getCourses(tokenLogin);
-  } catch (e) {
-    return (
-      <div>
-        <button
-          className="inline-flex justify-center py-2 px-4 mr-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
-          onClick={login}
-        >
-          Login
-        </button>
-      </div>
-    );
-  }
 
   // Updates Dashboard courses list
     const handleUpdateList = (courses) => {
-      console.log(courses);
-    setCourseList(
-      courses.map((course) => (
-        <li
-          className="text-lg font-medium font-sans text-gray-700 hover:outline hover:outline-1 py-2 my-2 mx-2 rounded-lg"
-          key={course.title}
-        >
-          <label
-            className="form-check-label text-gray-800 grid grid-cols-12"
-            for="delete"
-          >
-            <input
-              className="col-span-1 form-check-input appearance-none ml-2 h-5 w-5 border rounded-md border-ubc-grey bg-white checked:bg-ubc-blue focus:outline-none transition duration-200 mt-1 align-baseline bg-no-repeat bg-center bg-contain float-left cursor-pointer"
-              type="checkbox"
-              value=""
-              id={
-                course.department +
-                " " +
-                course.number +
-                " " +
-                course.section +
-                " " +
-                course.session
-              }
-            />
-            <span className="col-span-1">{course.department}</span>
-            <span className="col-span-1 pl-2">{course.number}</span>
-            <span className="col-span-1 pl-2">{course.section}</span>
-            <span className="col-span-1 pl-3">{course.session}</span>
-            <span className="col-span-2">
-              {course.restricted === "true"
-                ? "Restricted + General"
-                : "General Only"}
-            </span>
-            <span className=" col-span-5">{course.description}</span>
-          </label>
-        </li>
-      ))
-    );
-    setCourseLoading(false);
+        console.log("updating:" + JSON.stringify(courses));
+    if (courses) {
+      setCourseList(
+        courses.map((course) => (
+            <li className="text-lg font-medium font-sans text-gray-700 hover:outline hover:outline-1 py-2 my-2 mx-2 rounded-lg"
+            key={course.name + " " + course.restricted}>
+            <label
+              className="form-check-label text-gray-800 grid grid-cols-12"
+              for="delete"
+            >
+              <input
+                className="col-span-1 form-check-input appearance-none ml-2 h-5 w-5 border rounded-md border-ubc-grey bg-white checked:bg-ubc-blue focus:outline-none transition duration-200 mt-1 align-baseline bg-no-repeat bg-center bg-contain float-left cursor-pointer"
+                type="checkbox"
+                value=""
+                id={course.name + " " + course.restricted}
+              />
+              <span className="col-span-1">{course.department}</span>
+              <span className="col-span-1 pl-2">{course.number}</span>
+              <span className="col-span-1 pl-2">{course.section}</span>
+              <span className="col-span-1 pl-3">{course.session}</span>
+              <span className="col-span-2">
+                {course.restricted === "true"
+                  ? "Restricted + General"
+                  : "General Only"}
+              </span>
+              <span className=" col-span-5">{course.description}</span>
+            </label>
+          </li>
+        ))
+      );
+    }
+      setCourseLoading(false);
   };
 
   // API call to get user's courses from dynamodb based on email. Updates [courses] with returned data - this will trigger handleUpdateList.
-  async function getCourses(token) {
-    const getCourse = fetch(
-      `https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/tracking?key=email&email=${
-        jwt_decode(token).email
-      }`,
+    async function getCourses() {
+      setCourseLoading(true);
+
+    const email = jwt_decode(token).email;
+
+    const getCourse = await fetch(
+      `https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/tracking?key=email&email=${email}`,
       {
         method: "GET",
         headers: {
@@ -128,27 +81,19 @@ export default function Dashboard(token) {
     )
       .then((response) => response.json())
       .then((data) => {
-        trackedCourses = data;
-        if (data === []) {
-          setCourses([]);
-        } else {
-           
-           
-            setCourses(trackedCourses?.map((course) => (course.restricted + " " + course.name)).join(","));
-            console.log(courses)
-        }
+        setCourses(data);
       });
+
   }
 
   // API call to add course to tracking table
   const recordTracking = async (e, info) => {
     setSubmitLoading(true);
     e.preventDefault();
-    console.log(tokenLogin);
 
     const restricted = info.restricted ? "true" : "false";
     const session = info.session === "Winter" ? "W" : "S";
-    const email = jwt_decode(tokenLogin).email;
+    const email = jwt_decode(token).email;
 
     const response = await fetch(
       "https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/tracking",
@@ -156,7 +101,7 @@ export default function Dashboard(token) {
         method: "POST",
         headers: {
           Accept: "application/json",
-          Authorization: tokenLogin,
+          Authorization: token,
         },
         body: JSON.stringify({
           session: session,
@@ -173,50 +118,53 @@ export default function Dashboard(token) {
       }
     });
 
-    getCourses(tokenLogin);
+    getCourses();
     setSubmitLoading(false);
     setOpen(false);
 
     return 200;
   };
+    
+    
 
   // API call to delete course from tracking table
-  async function deleteSelectedTracking() {
+    async function deleteSelectedTracking() {
     setDeleteLoading(true);
     var items = document.querySelectorAll("input[type=checkbox]:checked");
     for (var i = 0; i < items.length; i++) {
-      console.log(items[i].id.replace(/\s+/g, " ").trim().split(" "));
-      let deleteArray = items[i].id.replace(/\s+/g, " ").trim().split(" ");
+        let deleteArray = items[i].id.replace(/\s+/g, " ").trim().split(" ");
+        console.log(deleteArray);
       const response = await fetch(
         "https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/tracking",
         {
           method: "DELETE",
           headers: {
             Accept: "application/json",
-            Authorization: tokenLogin,
+            Authorization: token,
           },
           body: JSON.stringify({
-            session: deleteArray[3],
-            department: deleteArray[0],
-            number: deleteArray[1],
-            section: deleteArray[2],
-            email: jwt_decode(tokenLogin).email,
+            session: deleteArray[0],
+            department: deleteArray[1],
+            number: deleteArray[2],
+            section: deleteArray[3],
+            email: jwt_decode(token).email,
           }),
         }
-      );
+      ).then((response) => {console.log( "Successfully deleted course" )});
     }
+    getCourses();
     setDeleteLoading(false);
     setCourseLoading(true);
-    getCourses(tokenLogin);
+       
   }
 
   function trim(myString) {
     return myString.replace(/^\s+|\s+$/g, "");
   }
 
+
   return (
     <>
-      {" "}
       <Transition.Root show={open} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={setOpen}>
           <Transition.Child
@@ -458,8 +406,8 @@ export default function Dashboard(token) {
             <div className="shadow overflow-hidden sm:rounded-md border-ubc-blue border-solid border-2">
               <div className="px-4 py-5 bg-white sm:p-6">
                 <div className="">
-                  <ul className="max-h-80 min-h-full overflow-auto overflow-y-scroll">
-                    {courseList}
+                                  <ul className="max-h-80 min-h-full overflow-auto overflow-y-scroll">
+                                      {!courseLoading && courseList}
                     {courseLoading && (
                       <svg
                         role="status"

@@ -25,7 +25,7 @@ function SideBar() {
                   className={({ isActive }) =>
                     isActive ? setDashboard(true) : setDashboard(false)
                   }
-                  to="/dashboard"
+                  to="/"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -51,7 +51,7 @@ function SideBar() {
                   className={({ isActive }) =>
                     isActive ? setAbout(true) : setAbout(false)
                   }
-                  to="/"
+                  to="/account"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
