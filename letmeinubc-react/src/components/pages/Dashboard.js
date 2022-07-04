@@ -50,8 +50,8 @@ export default function Dashboard(loginToken) {
               <span className="col-span-1 pl-2">{course.section}</span>
               <span className="col-span-1 pl-3">{course.session}</span>
               <span className="col-span-2">
-                {course.restricted === "true"
-                  ? "Restricted + General"
+                {course.restricted === "false"
+                  ? "Restricted & General"
                   : "General Only"}
               </span>
               <span className=" col-span-5">{course.description}</span>
@@ -329,7 +329,7 @@ export default function Dashboard(loginToken) {
           <SideBar />
         </div>
 
-        <div className="basis-5/6 md:grid md:grid-cols-5 bg-white rounded-r-xl">
+        <div className="basis-5/6 md:grid md:grid-cols-5 bg-white rounded-r-xl shadow-2xl">
           <div className="mt-5 md:mt-0 md:col-span-4 ml-20">
             <h1 className="text-5xl font-bold font-sans text-black my-16">
               {" "}
@@ -403,11 +403,11 @@ export default function Dashboard(loginToken) {
               </div>
             </div>
 
-            <div className="shadow overflow-hidden sm:rounded-md border-ubc-blue border-solid border-2">
+            <div className=" overflow-hidden sm:rounded-lg border-ubc-blue border-solid border-2 h-ListH">
               <div className="px-4 py-5 bg-white sm:p-6">
                 <div className="">
-                                  <ul className="max-h-80 min-h-full overflow-auto overflow-y-scroll">
-                                      {!courseLoading && courseList}
+                  <ul className="max-h-80 min-h-full overflow-auto overflow-y-scroll">
+                    {!courseLoading && courseList}
                     {courseLoading && (
                       <svg
                         role="status"

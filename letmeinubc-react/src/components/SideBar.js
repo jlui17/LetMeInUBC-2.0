@@ -53,21 +53,20 @@ function SideBar() {
                   }
                   to="/account"
                 >
+                 
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 inline-block mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="white"
-                    strokeWidth={2}
+                    className= "h-6 w-6 inline-block mr-2"
+                    viewBox="0 0 20 20"
+                    fill="white"
                   >
                     <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
+                      clipRule="evenodd"
                     />
                   </svg>
-                  <span className="text-white">About</span>
+                  <span className="text-white">account</span>
                 </NavLink>
               </div>
             </li>

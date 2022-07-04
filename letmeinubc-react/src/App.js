@@ -20,6 +20,7 @@ function App() {
 
   try {
     tokenLogin = window.location.href.split("=")[1].split("&"[0])[0];
+   
 
     console.log("loging");
   } catch (e) {
