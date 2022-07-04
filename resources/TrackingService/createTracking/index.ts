@@ -1,5 +1,6 @@
 import { Lambda } from 'aws-sdk';
 import { createTracking } from './CreateTracking';
+import { getCourseDataIfAvailable } from '../getTracking/getCourseDataIfAvailable';
 
 const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest): Promise<any> => {
   const invokeLambda = (params: Lambda.InvocationRequest) => {
@@ -21,35 +22,40 @@ const GET_COURSE_DATA_FUNCTION_NAME = process.env.GET_COURSE_DATA_FUNCTION_NAME 
 
 exports.handler = async (event: any): Promise<any> => {
   const { department, section, number, session, email, restricted } = JSON.parse(event.body);
+  const courseName = `${session} ${department} ${number} ${section}`
 
-  const getCourseDataParams = {
-    department: department,
-    section: section,
-    number: number,
-    session: session
-  }
+  let courseData = await getCourseDataIfAvailable(courseName);
 
-  const getCourseDataInvokeParams = {
-    FunctionName: GET_COURSE_DATA_FUNCTION_NAME,
-    Payload: Buffer.from(JSON.stringify(getCourseDataParams)),
-  }
+  if (courseData?.length === 0) {
+    const getCourseDataParams = {
+      department: department,
+      section: section,
+      number: number,
+      session: session
+    }
 
-  const getCourseDataResponse: {
-    department?: string,
-    section?: string,
-    number?: string,
-    session?: string,
-    title?: string,
-    description?: string,
-    error?: string,
-  } = await invokeLambdaAndGetData(getCourseDataInvokeParams);
+    const getCourseDataInvokeParams = {
+      FunctionName: GET_COURSE_DATA_FUNCTION_NAME,
+      Payload: Buffer.from(JSON.stringify(getCourseDataParams)),
+    }
 
-  if (getCourseDataResponse.error) {
-    return {
-      statusCode: 404,
-      headers: { "Access-Control-Allow-Origin": "*" },
-      body: getCourseDataResponse.error,
-    };
+    const courseDataFromWebsite = await invokeLambdaAndGetData(getCourseDataInvokeParams);
+
+    if (courseDataFromWebsite.error) {
+      return {
+        statusCode: 404,
+        headers: { "Access-Control-Allow-Origin": "*" },
+        body: courseDataFromWebsite.error,
+      };
+    }
+
+    courseData.push({
+      department: courseDataFromWebsite.department,
+      section: courseDataFromWebsite.section,
+      number: courseDataFromWebsite.number,
+      session: courseDataFromWebsite.session,
+      description: courseDataFromWebsite.description,
+    });
   }
 
   const createTrackingInput = {
@@ -59,7 +65,7 @@ exports.handler = async (event: any): Promise<any> => {
     session: session,
     email: email,
     restricted: restricted,
-    description: getCourseDataResponse.description || ''
+    description: courseData ? courseData[0].description : ''
   }
 
   const createTrackingResponse: boolean = await createTracking(createTrackingInput);

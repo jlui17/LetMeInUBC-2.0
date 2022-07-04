@@ -189,7 +189,7 @@ export class LetMeInUbc20Stack extends Stack {
       },
     });
 
-    trackingTable.grantWriteData(trackingService.createEndpointHandler);
+    trackingTable.grantReadWriteData(trackingService.createEndpointHandler);
     trackingTable.grantReadData(trackingService.getEndpointHandler);
     trackingTable.grantReadData(trackingService.getByCourseHandler);
     trackingTable.grantReadData(trackingService.getByAllCoursesHandler);
