@@ -41,10 +41,9 @@ function App() {
     <>
       <Router>
         <Routes>
-
+          <Route path="/" element={<Landing />} />
           <Route path="/account" element={<Account />} />
           <Route path="/" element={<Dashboard loginToken={tokenLogin} />} />
-
         </Routes>
       </Router>
     </>
