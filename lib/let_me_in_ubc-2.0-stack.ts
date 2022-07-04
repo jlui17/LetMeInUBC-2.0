@@ -1,6 +1,6 @@
-import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
-import { Duration, Stack, StackProps } from 'aws-cdk-lib';
-import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import { Duration, Stack, StackProps } from "aws-cdk-lib";
+import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import {
   AuthorizationType,
   AwsIntegration,
@@ -21,9 +21,9 @@ import { TrackingService } from "./services/TrackingService";
 import { WebService } from "./services/WebService";
 import { NotifyService } from "./services/NotifyService";
 import { RefreshAndNotifyService } from "./services/RefreshAndNotifyService";
-import * as iam from 'aws-cdk-lib/aws-iam';
-import * as events from 'aws-cdk-lib/aws-events'
-import * as targets from 'aws-cdk-lib/aws-events-targets'
+import * as iam from "aws-cdk-lib/aws-iam";
+import * as events from "aws-cdk-lib/aws-events";
+import * as targets from "aws-cdk-lib/aws-events-targets";
 
 const CURRENT_SCHOOL_YEAR = "2022";
 const REFRESH_INTERVAL = Duration.minutes(5);
@@ -100,13 +100,17 @@ export class LetMeInUbc20Stack extends Stack {
     trackingTable.addGlobalSecondaryIndex({
       indexName: "courseIndex",
       partitionKey: { name: "courseName", type: dynamodb.AttributeType.STRING },
-      sortKey: { name: "includeRestrictedSeats", type: dynamodb.AttributeType.STRING },
+      sortKey: {
+        name: "includeRestrictedSeats",
+        type: dynamodb.AttributeType.STRING,
+      },
     });
     const trackingService = new TrackingService(this, "TrackingService", {
       TRACKING_TABLE_NAME: trackingTable.tableName,
       EMAIL_INDEX_NAME: "emailIndex",
       COURSE_INDEX_NAME: "courseIndex",
-      GET_COURSE_DATA_FUNCTION_NAME: webService.getCourseDataHandler.functionName
+      GET_COURSE_DATA_FUNCTION_NAME:
+        webService.getCourseDataHandler.functionName,
     });
     const trackingRoute = api.root.addResource("tracking");
     trackingRoute.addMethod(
@@ -137,15 +141,20 @@ export class LetMeInUbc20Stack extends Stack {
     const notifyService = new NotifyService(this, "NotifyService", {
       CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR,
     });
-    notifyService.handler.addToRolePolicy(new iam.PolicyStatement({
-      actions: ['ses:SendEmail', 'SES:SendRawEmail'],
-      resources: ['*'],
-      effect: iam.Effect.ALLOW,
-    }));
+    notifyService.handler.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ["ses:SendEmail", "SES:SendRawEmail"],
+        resources: ["*"],
+        effect: iam.Effect.ALLOW,
+      })
+    );
 
-    const refreshAndNotifyService = new RefreshAndNotifyService(this, "RefreshAndNotifyService",
+    const refreshAndNotifyService = new RefreshAndNotifyService(
+      this,
+      "RefreshAndNotifyService",
       {
-        GET_AVAILABLE_COURSES: webService.getAvailableCoursesHandler.functionName,
+        GET_AVAILABLE_COURSES:
+          webService.getAvailableCoursesHandler.functionName,
         NOTIFY_CONTACTS: notifyService.handler.functionName,
         GET_ALL_COURSES: trackingService.getByAllCoursesHandler.functionName,
         GET_EMAILS: trackingService.getByCourseHandler.functionName,
@@ -154,17 +163,17 @@ export class LetMeInUbc20Stack extends Stack {
     );
 
     const refreshAndNotifyPolicy = new iam.PolicyStatement({
-      actions: ['lambda:*'],
-      resources: ['arn:aws:lambda:us-west-2:*'],
+      actions: ["lambda:*"],
+      resources: ["arn:aws:lambda:us-west-2:*"],
     });
     refreshAndNotifyService.handler.role?.attachInlinePolicy(
-      new iam.Policy(this, 'refresh-and-notify-policy', {
+      new iam.Policy(this, "refresh-and-notify-policy", {
         statements: [refreshAndNotifyPolicy],
-      }),
+      })
     );
-    const eventRule = new events.Rule(this, 'scheduleRule', {
+    const eventRule = new events.Rule(this, "scheduleRule", {
       schedule: events.Schedule.rate(REFRESH_INTERVAL),
-    })
+    });
 
     //Create SPA - Cloudfront-SPA for in-built https support, deploy first to get URL
     const spa_app = new SPADeploy(this, "spaDeploy").createSiteWithCloudfront({
@@ -194,12 +203,23 @@ export class LetMeInUbc20Stack extends Stack {
     trackingTable.grantReadData(trackingService.getByCourseHandler);
     trackingTable.grantReadData(trackingService.getByAllCoursesHandler);
     trackingTable.grantWriteData(trackingService.deleteHandler);
+    trackingTable.grantWriteData(trackingService.deleteEndpointHandler);
 
-    webService.getCourseDataHandler.grantInvoke(trackingService.createEndpointHandler);
+    webService.getCourseDataHandler.grantInvoke(
+      trackingService.createEndpointHandler
+    );
 
-    trackingService.getByAllCoursesHandler.grantInvoke(refreshAndNotifyService.handler);
-    trackingService.getByCourseHandler.grantInvoke(refreshAndNotifyService.handler);
-    trackingService.deleteEndpointHandler.grantInvoke(refreshAndNotifyService.handler);
-    eventRule.addTarget(new targets.LambdaFunction(refreshAndNotifyService.handler));
+    trackingService.getByAllCoursesHandler.grantInvoke(
+      refreshAndNotifyService.handler
+    );
+    trackingService.getByCourseHandler.grantInvoke(
+      refreshAndNotifyService.handler
+    );
+    trackingService.deleteEndpointHandler.grantInvoke(
+      refreshAndNotifyService.handler
+    );
+    eventRule.addTarget(
+      new targets.LambdaFunction(refreshAndNotifyService.handler)
+    );
   }
 }
