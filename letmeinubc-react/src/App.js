@@ -24,16 +24,7 @@ function App() {
 
     console.log("loging");
   } catch (e) {
-    return (
-      <div>
-        <button
-          className="inline-flex justify-center py-2 px-4 mr-4 border border-transparent shadow-sm text-lg font-sans font-lg rounded-md text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
-          onClick={() => login}
-        >
-          Login
-        </button>
-      </div>
-    );
+    console.log("not Logged in")
   }
 
   console.log("this is");

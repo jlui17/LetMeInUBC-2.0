@@ -10,7 +10,12 @@ export default function Dashboard(loginToken) {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [courseLoading, setCourseLoading] = useState(false);
-    const [token, setToken] = useState("");
+  const [token, setToken] = useState("");
+
+  
+  if (!loginToken.loginToken) {
+    window.location.replace("https://dxi81lck7ldij.cloudfront.net/");
+  }
     
 
   useEffect(() => {
@@ -50,7 +55,7 @@ export default function Dashboard(loginToken) {
               <span className="col-span-1 pl-2">{course.section}</span>
               <span className="col-span-1 pl-3">{course.session}</span>
               <span className="col-span-2">
-                {course.restricted === "false"
+                {course.restricted === "true"
                   ? "Restricted & General"
                   : "General Only"}
               </span>
@@ -264,7 +269,7 @@ export default function Dashboard(loginToken) {
                               htmlFor="session"
                               className="h-10 pl-1block text-lg font-medium text-gray-700"
                             >
-                              General Seats Only
+                              Include Restricted Seats
                             </label>
                             <input
                               className="form-check-input appearance-none h-5 w-5 border rounded-md border-ubc-grey bg-white checked:bg-ubc-blue focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer"

@@ -4,14 +4,14 @@ import { NavLink } from "react-router-dom";
 export default function Account() {
   function login() {
     window.location.replace(
-      "https://letmeinubc.auth.us-west-2.amazoncognito.com/login?client_id=2shgpu14nnj4ulipe5ui6ja6b7&response_type=token&scope=openid&redirect_uri=https://dxi81lck7ldij.cloudfront.net/"
+      "https://letmeinubc.auth.us-west-2.amazoncognito.com/login?client_id=2shgpu14nnj4ulipe5ui6ja6b7&response_type=token&scope=openid&redirect_uri=https://dxi81lck7ldij.cloudfront.net/dashboard/"
     );
     return null;
   }
 
   function register() {
     window.location.replace(
-      "https://letmeinubc.auth.us-west-2.amazoncognito.com/signup?client_id=2shgpu14nnj4ulipe5ui6ja6b7&response_type=token&scope=openid&redirect_uri=https://dxi81lck7ldij.cloudfront.net/"
+      "https://letmeinubc.auth.us-west-2.amazoncognito.com/signup?client_id=2shgpu14nnj4ulipe5ui6ja6b7&response_type=token&scope=openid&redirect_uri=https://dxi81lck7ldij.cloudfront.net/dashboard/"
     );
     return null;
   }
@@ -30,15 +30,12 @@ export default function Account() {
             <div className="flex pt-8 py-10 pl-6 pr-12">
               <button
                 className="mr-1 h-8 w-28 inline-flex justify-center align-text-middle border-4 border-transparent shadow-sm text-md font-sans font-lg rounded-xl text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
-             
+              onClick={login}
               >
-                <NavLink
-                 
-                  to="/dashboard"
-                >
+               
                  
                   Log in
-                </NavLink>
+                
               </button>
 
               <button

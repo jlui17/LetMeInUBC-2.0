@@ -188,7 +188,7 @@ export class LetMeInUbc20Stack extends Stack {
           implicitCodeGrant: true, //generates JWT
         },
         scopes: [OAuthScope.OPENID],
-        callbackUrls: ["https://dxi81lck7ldij.cloudfront.net/"], //Must begin with HTTPS else Validation Error
+        callbackUrls: ["https://dxi81lck7ldij.cloudfront.net/dashboard/"], //Must begin with HTTPS else Validation Error
       },
     });
 
