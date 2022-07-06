@@ -1,7 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 
+import RegisterModal from '../RegisterModal';
+
 export default function Account() {
+  const [showModal, setShowModal] = useState(false);
+  function toggleModal() {
+    setShowModal(!showModal);
+  }
   function login() {
     window.location.replace(
       "https://letmeinubc.auth.us-west-2.amazoncognito.com/login?client_id=2shgpu14nnj4ulipe5ui6ja6b7&response_type=token&scope=openid&redirect_uri=https://dxi81lck7ldij.cloudfront.net/dashboard/"
@@ -40,10 +46,13 @@ export default function Account() {
 
               <button
                 className="ml-1 h-8 w-28 inline-flex justify-center align-text-middle border-4 border-transparent shadow-sm text-md font-sans font-lg rounded-xl text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
-                onClick={register}
+                onClick={() => {
+                  setShowModal(!showModal)
+                }}
               >
                 Register
               </button>
+              {showModal && <RegisterModal isOpen={showModal} handleClose={toggleModal}/>}
             </div>
           </div>
 
