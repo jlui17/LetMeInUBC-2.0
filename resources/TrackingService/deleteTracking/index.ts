@@ -37,3 +37,5 @@ exports.handler = async (event: any): Promise<any> => {
     body: response,
   };
 };
+
+export default exports.handler;
