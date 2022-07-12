@@ -1,0 +1,23 @@
+version: 1.0
+
+phases:
+  install:
+    python: 3.7
+    nodejs: 14
+  pre_build:
+    on-failure: ABORT
+    commands:
+      - echo "Installing dependencies"
+      - npm install
+      - cd letmeinubc-react
+      - npm install
+  build:
+    on-failure: ABORT
+    commands:
+      - cd letmeinubc-react
+      - npm run build
+  post_build:
+    on-failure: ABORT
+    commands:
+      - npm run test
+  
