@@ -17,10 +17,10 @@ import {
   CfnUserPoolResourceServer,
 } from "aws-cdk-lib/aws-cognito";
 
-import { TrackingService } from "./services/TrackingService";
-import { WebService } from "./services/WebService";
-import { NotifyService } from "./services/NotifyService";
-import { RefreshAndNotifyService } from "./services/RefreshAndNotifyService";
+import { TrackingService } from "../../services/TrackingService";
+import { WebService } from "../../services/WebService";
+import { NotifyService } from "../../services/NotifyService";
+import { RefreshAndNotifyService } from "../../services/RefreshAndNotifyService";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as events from "aws-cdk-lib/aws-events";
 import * as targets from "aws-cdk-lib/aws-events-targets";
