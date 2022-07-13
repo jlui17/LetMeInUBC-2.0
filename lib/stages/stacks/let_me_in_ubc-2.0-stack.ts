@@ -1,5 +1,5 @@
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
-import { Duration, Stack, StackProps } from "aws-cdk-lib";
+import { CfnOutput, Duration, Stack, StackProps } from "aws-cdk-lib";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import {
   AuthorizationType,
@@ -30,6 +30,9 @@ const REFRESH_INTERVAL = Duration.minutes(5);
 const PAUSE_BETWEEN_REQUESTS = "0"; // seconds
 
 export class LetMeInUbc20Stack extends Stack {
+  public readonly apiEndpoint: CfnOutput;
+  public readonly websiteUrl: CfnOutput;
+
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
@@ -53,7 +56,33 @@ export class LetMeInUbc20Stack extends Stack {
       },
     });
 
-    const api = new apigateway.RestApi(this, "CoursesAPI", {
+    //Create SPA - Cloudfront-SPA for in-built https support, deploy first to get URL
+    const spa_app = new SPADeploy(this, "spaDeploy").createSiteWithCloudfront({
+      indexDoc: "index.html",
+      websiteFolder: "letmeinubc-react/build",
+    });
+    this.websiteUrl = new CfnOutput(this, "LetMeInUBC-Website-URL", {
+      value: spa_app.websiteBucket.bucketWebsiteUrl,
+    });
+
+    // Create App client for authorization
+    pool.addClient("app-client", {
+      oAuth: {
+        flows: {
+          implicitCodeGrant: true, //generates JWT
+        },
+        scopes: [OAuthScope.OPENID],
+        callbackUrls: [`${this.websiteUrl.value}/dashboard`], //Must begin with HTTPS else Validation Error
+      },
+    });
+
+    pool.addDomain("LetMeInUBC", {
+      cognitoDomain: {
+        domainPrefix: "letmeinubc",
+      },
+    });
+
+    const api = new apigateway.RestApi(this, "LetMeIn-API", {
       defaultCorsPreflightOptions: {
         allowHeaders: [
           "Content-Type",
@@ -64,7 +93,6 @@ export class LetMeInUbc20Stack extends Stack {
         ],
         allowMethods: ["GET", "POST", "DELETE"],
         allowCredentials: true,
-        //"https://dxi81lck7ldij.cloudfront.net" /
         allowOrigins: Cors.ALL_ORIGINS,
       },
 
@@ -73,6 +101,9 @@ export class LetMeInUbc20Stack extends Stack {
         tracingEnabled: true,
         loggingLevel: MethodLoggingLevel.INFO,
       },
+    });
+    this.apiEndpoint = new CfnOutput(this, "API-Endpoint", {
+      value: api.url,
     });
 
     const authorizer = new CognitoUserPoolsAuthorizer(
@@ -173,29 +204,6 @@ export class LetMeInUbc20Stack extends Stack {
     );
     const eventRule = new events.Rule(this, "scheduleRule", {
       schedule: events.Schedule.rate(REFRESH_INTERVAL),
-    });
-
-    //Create SPA - Cloudfront-SPA for in-built https support, deploy first to get URL
-    const spa_app = new SPADeploy(this, "spaDeploy").createSiteWithCloudfront({
-      indexDoc: "index.html",
-      websiteFolder: "letmeinubc-react/build",
-    });
-
-    // Create App client for authorization
-    pool.addClient("app-client", {
-      oAuth: {
-        flows: {
-          implicitCodeGrant: true, //generates JWT
-        },
-        scopes: [OAuthScope.OPENID],
-        callbackUrls: ["https://dxi81lck7ldij.cloudfront.net/dashboard/"], //Must begin with HTTPS else Validation Error
-      },
-    });
-
-    pool.addDomain("LetMeInUBC", {
-      cognitoDomain: {
-        domainPrefix: "letmeinubc",
-      },
     });
 
     trackingTable.grantReadWriteData(trackingService.createEndpointHandler);
