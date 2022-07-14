@@ -72,7 +72,7 @@ export class LetMeInUbc20Stack extends Stack {
           implicitCodeGrant: true, //generates JWT
         },
         scopes: [OAuthScope.OPENID],
-        callbackUrls: [`${this.websiteUrl.value}/dashboard`], //Must begin with HTTPS else Validation Error
+        callbackUrls: [`https://${this.websiteUrl.value}/dashboard`], //Must begin with HTTPS else Validation Error
       },
     });
 
