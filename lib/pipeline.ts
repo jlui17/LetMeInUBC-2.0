@@ -20,7 +20,6 @@ export class LetMeInUbc20PipelineStack extends Stack {
     const pipeline = new CodePipeline(this, "LetMeInUBC-Pipeline", {
       pipelineName: "LetMeInUBC-Deployment-Pipeline",
       dockerEnabledForSynth: true,
-      dockerEnabledForSelfMutation: true,
       synth: new ShellStep("Synth", {
         input: source,
         commands: [
@@ -28,11 +27,16 @@ export class LetMeInUbc20PipelineStack extends Stack {
           "cd letmeinubc-react && npm ci && npm run build",
           "cd .. && npx cdk synth",
         ],
-        env: {
-          EMAILER_USER: process.env.EMAILER_USER || "",
-          EMAILER_PASS: process.env.EMAILER_PASS || "",
-        },
       }),
+      codeBuildDefaults: {},
+      assetPublishingCodeBuildDefaults: {
+        buildEnvironment: {
+          environmentVariables: {
+            EMAILER_USER: { value: process.env.EMAILER_USER || "" },
+            EMAILER_PASS: { value: process.env.EMAILER_PASS || "" },
+          },
+        },
+      },
     });
 
     pipeline.addStage(
