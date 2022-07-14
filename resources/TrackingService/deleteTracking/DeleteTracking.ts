@@ -1,4 +1,4 @@
-import { DynamoDBClient, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDB } from "aws-sdk";
 
 const TRACKING_TABLE_NAME = process.env.TRACKING_TABLE_NAME || "";
 
@@ -13,22 +13,21 @@ interface courseTrackingParams {
 export const deleteTracking = async (
   event: courseTrackingParams
 ): Promise<boolean> => {
-  const db = new DynamoDBClient({});
+  const db = new DynamoDB.DocumentClient();
   const { department, section, number, session, email } = event;
   const courseName = `${session} ${department} ${number} ${section}`;
 
   let response: boolean = true; // using this comment to rebuild lambda
 
   await db
-    .send(
-      new DeleteItemCommand({
-        TableName: TRACKING_TABLE_NAME,
-        Key: {
-          courseName: { S: courseName },
-          email: { S: email },
-        },
-      })
-    )
+    .delete({
+      TableName: TRACKING_TABLE_NAME,
+      Key: {
+        courseName: courseName,
+        email: email,
+      },
+    })
+    .promise()
     .catch((error) => {
       response = false;
     });
