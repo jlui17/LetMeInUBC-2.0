@@ -5,11 +5,13 @@ import {
   ShellStep,
 } from "aws-cdk-lib/pipelines";
 import { Construct } from "constructs";
+import dotenv = require("dotenv");
 import { AppDeploymentStage } from "./stages/deploy";
 
 export class LetMeInUbc20PipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
+    dotenv.config();
 
     const source = CodePipelineSource.gitHub("jlui17/LetMeInUBC-2.0", "main", {
       authentication: SecretValue.secretsManager("GITHUB_ACCESS_TOKEN_SECRET"),
@@ -26,6 +28,10 @@ export class LetMeInUbc20PipelineStack extends Stack {
           "cd letmeinubc-react && npm ci && npm run build",
           "cd .. && npx cdk synth",
         ],
+        env: {
+          EMAILER_USER: process.env.EMAILER_USER || "",
+          EMAILER_PASS: process.env.EMAILER_PASS || "",
+        },
       }),
     });
 

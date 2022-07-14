@@ -171,6 +171,8 @@ export class LetMeInUbc20Stack extends Stack {
 
     const notifyService = new NotifyService(this, "NotifyService", {
       CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR,
+      EMAILER_USER: process.env.EMAILER_USER || "",
+      EMAILER_PASS: process.env.EMAILER_PASS || "",
     });
     notifyService.handler.addToRolePolicy(
       new iam.PolicyStatement({
