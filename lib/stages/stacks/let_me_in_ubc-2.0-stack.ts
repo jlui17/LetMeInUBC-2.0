@@ -24,6 +24,7 @@ import { RefreshAndNotifyService } from "../../services/RefreshAndNotifyService"
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as events from "aws-cdk-lib/aws-events";
 import * as targets from "aws-cdk-lib/aws-events-targets";
+import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 
 const CURRENT_SCHOOL_YEAR = "2022";
 const REFRESH_INTERVAL = Duration.minutes(5);
@@ -169,10 +170,17 @@ export class LetMeInUbc20Stack extends Stack {
       }
     );
 
+    const EMAILER_SECRETS = Secret.fromSecretNameV2(
+      this,
+      "ImportedEmailerSecret",
+      "EMAILER_ACCOUNT_INFO"
+    );
     const notifyService = new NotifyService(this, "NotifyService", {
       CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR,
-      EMAILER_USER: process.env.EMAILER_USER || "",
-      EMAILER_PASS: process.env.EMAILER_PASS || "",
+      EMAILER_USER:
+        EMAILER_SECRETS.secretValueFromJson("EMAILER_USER").toString(),
+      EMAILER_PASS:
+        EMAILER_SECRETS.secretValueFromJson("EMAILER_PASS").toString(),
     });
     notifyService.handler.addToRolePolicy(
       new iam.PolicyStatement({
