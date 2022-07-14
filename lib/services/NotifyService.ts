@@ -26,9 +26,11 @@ export class NotifyService extends Construct {
       environment: {
         CURRENT_SCHOOL_YEAR: props.CURRENT_SCHOOL_YEAR,
         EMAILER_USER:
-          EMAILER_SECRETS.secretValueFromJson("EMAILER_USER").toString() || "",
+          EMAILER_SECRETS.secretValueFromJson("EMAILER_USER").unsafeUnwrap() ||
+          "",
         EMAILER_PASS:
-          EMAILER_SECRETS.secretValueFromJson("EMAILER_PASS").toString() || "",
+          EMAILER_SECRETS.secretValueFromJson("EMAILER_PASS").unsafeUnwrap() ||
+          "",
       },
     });
   }
