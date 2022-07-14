@@ -62,7 +62,7 @@ export class LetMeInUbc20Stack extends Stack {
       websiteFolder: "letmeinubc-react/build",
     });
     this.websiteUrl = new CfnOutput(this, "LetMeInUBC-Website-URL", {
-      value: spa_app.websiteBucket.bucketWebsiteUrl,
+      value: spa_app.distribution.distributionDomainName,
     });
 
     // Create App client for authorization
