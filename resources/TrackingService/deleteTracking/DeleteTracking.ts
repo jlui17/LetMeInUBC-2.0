@@ -17,7 +17,7 @@ export const deleteTracking = async (
   const { department, section, number, session, email } = event;
   const courseName = `${session} ${department} ${number} ${section}`;
 
-  let response: boolean = true;
+  let response: boolean = true; // using this comment to rebuild lambda
 
   await db
     .send(
