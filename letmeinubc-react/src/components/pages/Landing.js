@@ -5,14 +5,14 @@ export default function Account() {
 
   function login() {
     window.location.replace(
-      "https://letmeinubc.auth.us-west-2.amazoncognito.com/login?client_id=2shgpu14nnj4ulipe5ui6ja6b7&response_type=token&scope=openid&redirect_uri=https://dxi81lck7ldij.cloudfront.net/dashboard/"
+      "https://letmeinubc.auth.us-west-2.amazoncognito.com/login?client_id=3e2v22r2pfjoc3sokp8lj05la1&response_type=token&scope=openid&redirect_uri=https://letmeinubc.com/dashboard"
     );
     return null;
   }
 
   function register() {
     window.location.replace(
-      "https://letmeinubc.auth.us-west-2.amazoncognito.com/signup?client_id=2shgpu14nnj4ulipe5ui6ja6b7&response_type=token&scope=openid&redirect_uri=https://dxi81lck7ldij.cloudfront.net/dashboard/"
+      "https://letmeinubc.auth.us-west-2.amazoncognito.com/signup?client_id=3e2v22r2pfjoc3sokp8lj05la1&response_type=token&scope=openid&redirect_uri=https://letmeinubc.com/dashboard"
     );
     return null;
   }

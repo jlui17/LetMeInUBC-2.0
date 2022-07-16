@@ -65,7 +65,7 @@ export class LetMeInUbc20Stack extends Stack {
       cfAliases: ["letmeinubc.com"],
     });
     this.websiteUrl = new CfnOutput(this, "LetMeInUBC-Website-URL", {
-      value: spa_app.distribution.distributionDomainName,
+      value: "letmeinubc.com",
     });
 
     // Create App client for authorization
