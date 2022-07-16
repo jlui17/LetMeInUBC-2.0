@@ -61,7 +61,7 @@ export class LetMeInUbc20Stack extends Stack {
       indexDoc: "index.html",
       websiteFolder: "letmeinubc-react/build",
       certificateARN:
-        "arn:aws:acm:us-west-2:284333539126:certificate/b14e3f43-831a-4a9a-98f9-a491b2ca8c72",
+        "arn:aws:acm:us-east-1:284333539126:certificate/24d8066b-bc55-4146-be81-09ed591b064f",
       cfAliases: ["letmeinubc.com"],
     });
     this.websiteUrl = new CfnOutput(this, "LetMeInUBC-Website-URL", {
