@@ -60,6 +60,9 @@ export class LetMeInUbc20Stack extends Stack {
     const spa_app = new SPADeploy(this, "spaDeploy").createSiteWithCloudfront({
       indexDoc: "index.html",
       websiteFolder: "letmeinubc-react/build",
+      certificateARN:
+        "arn:aws:acm:us-west-2:284333539126:certificate/b14e3f43-831a-4a9a-98f9-a491b2ca8c72",
+      cfAliases: ["letmeinubc.com"],
     });
     this.websiteUrl = new CfnOutput(this, "LetMeInUBC-Website-URL", {
       value: spa_app.distribution.distributionDomainName,
@@ -142,6 +145,7 @@ export class LetMeInUbc20Stack extends Stack {
       COURSE_INDEX_NAME: "courseIndex",
       GET_COURSE_DATA_FUNCTION_NAME:
         webService.getCourseDataHandler.functionName,
+      GET_WEBSITE_URL: `https://${this.websiteUrl.value}`,
     });
     const trackingRoute = api.root.addResource("tracking");
     trackingRoute.addMethod(
