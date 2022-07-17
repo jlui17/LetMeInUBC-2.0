@@ -32,6 +32,7 @@ const PAUSE_BETWEEN_REQUESTS = "0"; // seconds
 export class LetMeInUbc20Stack extends Stack {
   public readonly apiEndpoint: CfnOutput;
   public readonly websiteUrl: CfnOutput;
+  public readonly clientID: CfnOutput;
 
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
@@ -66,6 +67,9 @@ export class LetMeInUbc20Stack extends Stack {
     });
     this.websiteUrl = new CfnOutput(this, "LetMeInUBC-Website-URL", {
       value: "letmeinubc.com",
+    });
+    this.clientID = new CfnOutput(this, "LetMeInUBC-Client-ID", {
+      value: pool.userPoolId,
     });
 
     // Create App client for authorization
