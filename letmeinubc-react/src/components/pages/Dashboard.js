@@ -12,6 +12,8 @@ export default function Dashboard(loginToken) {
   const [courseLoading, setCourseLoading] = useState(false);
   const [token, setToken] = useState("");
 
+  const api_gateway_id = "q9nw3i29w0";
+
   
   if (!loginToken.loginToken) {
     window.location.replace("https://letmeinubc.com/");
@@ -75,7 +77,7 @@ export default function Dashboard(loginToken) {
     const email = jwt_decode(token).email;
 
     const getCourse = await fetch(
-      `https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/tracking?key=email&email=${email}`,
+      `https://${api_gateway_id}.execute-api.us-west-2.amazonaws.com/v1/tracking?key=email&email=${email}`,
       {
         method: "GET",
         headers: {
@@ -101,7 +103,7 @@ export default function Dashboard(loginToken) {
     const email = jwt_decode(token).email;
 
     const response = await fetch(
-      "https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/tracking",
+      `https://${api_gateway_id}.execute-api.us-west-2.amazonaws.com/v1/tracking`,
       {
         method: "POST",
         headers: {
@@ -140,7 +142,7 @@ export default function Dashboard(loginToken) {
         let deleteArray = items[i].id.replace(/\s+/g, " ").trim().split(" ");
         console.log(deleteArray);
       const response = await fetch(
-        "https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/tracking",
+        `https://${api_gateway_id}.execute-api.us-west-2.amazonaws.com/v1/tracking`,
         {
           method: "DELETE",
           headers: {
