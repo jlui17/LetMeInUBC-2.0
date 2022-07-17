@@ -14,7 +14,7 @@ export default function Dashboard(loginToken) {
 
   
   if (!loginToken.loginToken) {
-    window.location.replace("https://dxi81lck7ldij.cloudfront.net/");
+    window.location.replace("https://letmeinubc.com/");
   }
     
 
