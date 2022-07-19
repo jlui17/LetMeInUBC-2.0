@@ -23,7 +23,8 @@ export class LetMeInUbc20PipelineStack extends Stack {
         commands: [
           "npm ci && npm run build",
           "cd letmeinubc-react && npm ci && npm run build",
-          "cd .. && npx cdk synth",
+          "cd .. && npm run test",
+          "npx cdk synth",
         ],
       }),
     });
