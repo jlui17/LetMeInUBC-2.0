@@ -12,7 +12,6 @@ exports.handler = async (event: any): Promise<any> => {
   const { department, section, number, session, email } = JSON.parse(
     event.body
   );
-  const courseName = `${session} ${department} ${number} ${section}`;
 
   const deleteCourseInput: courseParams = {
     department: department,
@@ -37,5 +36,3 @@ exports.handler = async (event: any): Promise<any> => {
     body: response,
   };
 };
-
-export default exports.handler;
