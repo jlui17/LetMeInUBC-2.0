@@ -1,26 +1,24 @@
-import * as cdk from "aws-cdk-lib";
-import * as lambda from "aws-cdk-lib/aws-lambda";
+import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
 
 export class TrackingService extends Construct {
-  public readonly createEndpointHandler: lambda.Function;
-  public readonly deleteEndpointHandler: lambda.Function;
-  public readonly deleteHandler: lambda.Function;
-  public readonly getEndpointHandler: lambda.Function;
-  public readonly getByCourseHandler: lambda.Function;
-  public readonly getByAllCoursesHandler: lambda.Function;
+  public readonly createEndpointHandler: NodejsFunction;
+  public readonly deleteEndpointHandler: NodejsFunction;
+  public readonly deleteHandler: NodejsFunction;
+  public readonly getEndpointHandler: NodejsFunction;
+  public readonly getByCourseHandler: NodejsFunction;
+  public readonly getByAllCoursesHandler: NodejsFunction;
 
   constructor(scope: Construct, id: string, props: any) {
     super(scope, id);
     const RESOURCE_FOLDER = "resources/TrackingService";
 
-    this.createEndpointHandler = new lambda.Function(
+    this.createEndpointHandler = new NodejsFunction(
       this,
       "CreateEndpointTrackingHandler",
       {
-        runtime: lambda.Runtime.NODEJS_14_X,
-        handler: "createTracking/index.handler",
-        code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}`),
+        handler: "handler",
+        entry: `${RESOURCE_FOLDER}/createTracking/index.ts`,
         environment: {
           GET_COURSE_DATA_FUNCTION_NAME: props.GET_COURSE_DATA_FUNCTION_NAME,
           TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME,
@@ -29,35 +27,32 @@ export class TrackingService extends Construct {
       }
     );
 
-    this.deleteHandler = new lambda.Function(this, "DeleteTrackingHandler", {
-      runtime: lambda.Runtime.NODEJS_14_X,
-      handler: "DeleteTracking.handler",
-      code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}/deleteTracking`),
+    this.deleteHandler = new NodejsFunction(this, "DeleteTrackingHandler", {
+      handler: "deleteTracking",
+      entry: `${RESOURCE_FOLDER}/deleteTracking/DeleteTracking.ts`,
       environment: {
         TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME,
       },
     });
 
-    this.deleteEndpointHandler = new lambda.Function(
+    this.deleteEndpointHandler = new NodejsFunction(
       this,
       "DeleteEndpointTrackingHandler",
       {
-        runtime: lambda.Runtime.NODEJS_14_X,
-        handler: "index.handler",
-        code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}/deleteTracking`),
+        handler: "handler",
+        entry: `${RESOURCE_FOLDER}/deleteTracking/index.ts`,
         environment: {
           TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME,
         },
       }
     );
 
-    this.getEndpointHandler = new lambda.Function(
+    this.getEndpointHandler = new NodejsFunction(
       this,
       "GetEndpointTrackingHandler",
       {
-        runtime: lambda.Runtime.NODEJS_14_X,
-        handler: "index.handler",
-        code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}/getTracking`),
+        handler: "handler",
+        entry: `${RESOURCE_FOLDER}/getTracking/index.ts`,
         environment: {
           TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME,
           EMAIL_INDEX_NAME: props.EMAIL_INDEX_NAME,
@@ -66,13 +61,12 @@ export class TrackingService extends Construct {
       }
     );
 
-    this.getByCourseHandler = new lambda.Function(
+    this.getByCourseHandler = new NodejsFunction(
       this,
       "GetTrackingByCourseHandler",
       {
-        runtime: lambda.Runtime.NODEJS_14_X,
-        handler: "GetTrackingByCourse.handler",
-        code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}/getTracking`),
+        handler: "getTrackingByCourse",
+        entry: `${RESOURCE_FOLDER}/getTracking/GetTrackingByCourse.ts`,
         environment: {
           TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME,
           COURSE_INDEX_NAME: props.COURSE_INDEX_NAME,
@@ -80,13 +74,12 @@ export class TrackingService extends Construct {
       }
     );
 
-    this.getByAllCoursesHandler = new lambda.Function(
+    this.getByAllCoursesHandler = new NodejsFunction(
       this,
       "GetTrackingByAllCoursesHandler",
       {
-        runtime: lambda.Runtime.NODEJS_14_X,
-        handler: "GetTrackingByAllCourses.handler",
-        code: lambda.Code.fromAsset(`${RESOURCE_FOLDER}/getTracking`),
+        handler: "getTrackingByAllCourses",
+        entry: `${RESOURCE_FOLDER}/getTracking/GetTrackingByAllCourses.ts`,
         environment: {
           TRACKING_TABLE_NAME: props.TRACKING_TABLE_NAME,
         },
