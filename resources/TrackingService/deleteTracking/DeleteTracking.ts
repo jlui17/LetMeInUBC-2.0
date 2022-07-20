@@ -1,4 +1,4 @@
-import { DynamoDBClient, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
+import { DeleteItemCommand, DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
 const TRACKING_TABLE_NAME = process.env.TRACKING_TABLE_NAME || "";
 

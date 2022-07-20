@@ -1,5 +1,5 @@
-import { mockClient } from "aws-sdk-client-mock";
 import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
+import { mockClient } from "aws-sdk-client-mock";
 import { createTracking } from "../../../resources/TrackingService/createTracking/CreateTracking";
 
 const ddbMockClient = mockClient(DynamoDBClient);

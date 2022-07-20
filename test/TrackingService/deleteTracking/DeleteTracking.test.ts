@@ -1,5 +1,5 @@
+import { DeleteItemCommand, DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { mockClient } from "aws-sdk-client-mock";
-import { DynamoDBClient, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
 import { deleteTracking } from "../../../resources/TrackingService/deleteTracking/DeleteTracking";
 
 const ddbMockClient = mockClient(DynamoDBClient);

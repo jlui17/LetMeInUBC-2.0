@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import "source-map-support/register";
 import * as cdk from "aws-cdk-lib";
+import "source-map-support/register";
 import { LetMeInUbc20PipelineStack } from "../lib/pipeline";
 
 const app = new cdk.App();

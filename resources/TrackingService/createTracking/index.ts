@@ -1,7 +1,7 @@
 import { Lambda } from "aws-sdk";
-import { createTracking } from "./CreateTracking";
-import { getCourseDataIfAvailable } from "../getTracking/getCourseDataIfAvailable";
 import { CORS_ORIGIN_HEADER } from "../../shared/Constants";
+import { getCourseDataIfAvailable } from "../getTracking/getCourseDataIfAvailable";
+import { createTracking } from "./CreateTracking";
 
 const invokeLambdaAndGetData = async (
   params: Lambda.InvocationRequest

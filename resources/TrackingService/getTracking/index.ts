@@ -1,7 +1,7 @@
-import { getTrackingByAllCourses } from "./GetTrackingByAllCourses";
-import { getTrackingByEmail } from "./GetTrackingByEmail";
-import { getTrackingByCourse } from "./GetTrackingByCourse";
 import { CORS_ORIGIN_HEADER } from "../../shared/Constants";
+import { getTrackingByAllCourses } from "./GetTrackingByAllCourses";
+import { getTrackingByCourse } from "./GetTrackingByCourse";
+import { getTrackingByEmail } from "./GetTrackingByEmail";
 
 exports.handler = async (event: any): Promise<any> => {
   const { key } = event.queryStringParameters;

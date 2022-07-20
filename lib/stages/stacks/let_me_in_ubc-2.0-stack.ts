@@ -1,4 +1,3 @@
-import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import { CfnOutput, Duration, Stack, StackProps } from "aws-cdk-lib";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import {
@@ -6,23 +5,23 @@ import {
   CognitoUserPoolsAuthorizer,
   MethodLoggingLevel,
 } from "aws-cdk-lib/aws-apigateway";
-import { Construct } from "constructs";
-import { SPADeploy } from "cdk-spa-deploy";
 import {
-  UserPool,
   OAuthScope,
+  UserPool,
   VerificationEmailStyle,
-  CfnUserPoolResourceServer,
 } from "aws-cdk-lib/aws-cognito";
+import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import { SPADeploy } from "cdk-spa-deploy";
+import { Construct } from "constructs";
 
-import { TrackingService } from "../../services/TrackingService";
-import { WebService } from "../../services/WebService";
-import { NotifyService } from "../../services/NotifyService";
-import { RefreshAndNotifyService } from "../../services/RefreshAndNotifyService";
-import * as iam from "aws-cdk-lib/aws-iam";
 import * as events from "aws-cdk-lib/aws-events";
 import * as targets from "aws-cdk-lib/aws-events-targets";
+import * as iam from "aws-cdk-lib/aws-iam";
 import { WEBSITE_URL } from "../../../resources/shared/Constants";
+import { NotifyService } from "../../services/NotifyService";
+import { RefreshAndNotifyService } from "../../services/RefreshAndNotifyService";
+import { TrackingService } from "../../services/TrackingService";
+import { WebService } from "../../services/WebService";
 
 const CURRENT_SCHOOL_YEAR = "2022";
 const REFRESH_INTERVAL = Duration.minutes(5);

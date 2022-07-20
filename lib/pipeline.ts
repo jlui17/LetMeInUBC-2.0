@@ -1,4 +1,4 @@
-import { SecretValue, Stack, StackProps } from "aws-cdk-lib";
+import { Stack, StackProps } from "aws-cdk-lib";
 import {
   CodePipeline,
   CodePipelineSource,

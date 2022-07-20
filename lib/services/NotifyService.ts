@@ -1,9 +1,9 @@
 import * as cdk from "aws-cdk-lib";
-import { Construct } from "constructs";
-import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import * as lambda from "aws-cdk-lib/aws-lambda";
-import * as path from "path";
+import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Secret } from "aws-cdk-lib/aws-secretsmanager";
+import { Construct } from "constructs";
+import * as path from "path";
 
 export class NotifyService extends Construct {
   public readonly handler: lambda.Function;
