@@ -3,9 +3,7 @@ import { CfnOutput, Duration, Stack, StackProps } from "aws-cdk-lib";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import {
   AuthorizationType,
-  AwsIntegration,
   CognitoUserPoolsAuthorizer,
-  Cors,
   MethodLoggingLevel,
 } from "aws-cdk-lib/aws-apigateway";
 import { Construct } from "constructs";
@@ -24,6 +22,7 @@ import { RefreshAndNotifyService } from "../../services/RefreshAndNotifyService"
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as events from "aws-cdk-lib/aws-events";
 import * as targets from "aws-cdk-lib/aws-events-targets";
+import { WEBSITE_URL } from "../../../resources/shared/Constants";
 
 const CURRENT_SCHOOL_YEAR = "2022";
 const REFRESH_INTERVAL = Duration.minutes(5);
@@ -66,7 +65,7 @@ export class LetMeInUbc20Stack extends Stack {
       cfAliases: ["letmeinubc.com"],
     });
     this.websiteUrl = new CfnOutput(this, "LetMeInUBC-Website-URL", {
-      value: "letmeinubc.com",
+      value: WEBSITE_URL,
     });
     this.clientID = new CfnOutput(this, "LetMeInUBC-Client-ID", {
       value: pool.userPoolId,
