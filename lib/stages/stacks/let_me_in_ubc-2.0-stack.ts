@@ -79,7 +79,7 @@ export class LetMeInUbc20Stack extends Stack {
           implicitCodeGrant: true, //generates JWT
         },
         scopes: [OAuthScope.OPENID],
-        callbackUrls: [`https://${this.websiteUrl.value}/dashboard`], //Must begin with HTTPS else Validation Error
+        callbackUrls: [`${this.websiteUrl.value}/dashboard`], //Must begin with HTTPS else Validation Error
       },
     });
 
@@ -100,7 +100,7 @@ export class LetMeInUbc20Stack extends Stack {
         ],
         allowMethods: ["GET", "POST", "DELETE"],
         allowCredentials: true,
-        allowOrigins: Cors.ALL_ORIGINS,
+        allowOrigins: [this.websiteUrl.value],
       },
 
       deployOptions: {
@@ -149,7 +149,6 @@ export class LetMeInUbc20Stack extends Stack {
       COURSE_INDEX_NAME: "courseIndex",
       GET_COURSE_DATA_FUNCTION_NAME:
         webService.getCourseDataHandler.functionName,
-      GET_WEBSITE_URL: `https://${this.websiteUrl.value}`,
     });
     const trackingRoute = api.root.addResource("tracking");
     trackingRoute.addMethod(

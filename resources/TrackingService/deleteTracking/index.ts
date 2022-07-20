@@ -1,3 +1,4 @@
+import { CORS_ORIGIN_HEADER } from "../../shared/Constants";
 import { deleteTracking } from "./DeleteTracking";
 
 interface courseParams {
@@ -26,13 +27,13 @@ exports.handler = async (event: any): Promise<any> => {
   if (response === false)
     return {
       statusCode: 500,
-      headers: { "Access-Control-Allow-Origin": "*" },
+      headers: { ...CORS_ORIGIN_HEADER },
       body: "Error deleting tracking entry from table",
     };
 
   return {
     statusCode: 200,
-    headers: { "Access-Control-Allow-Origin": "*" },
+    headers: { ...CORS_ORIGIN_HEADER },
     body: response,
   };
 };
