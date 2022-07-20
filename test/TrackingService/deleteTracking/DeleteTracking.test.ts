@@ -4,20 +4,20 @@ import { deleteTracking } from "../../../resources/TrackingService/deleteTrackin
 
 const ddbMockClient = mockClient(DynamoDBClient);
 
+const deleteTrackingInput = {
+  department: "dep",
+  number: "num",
+  session: "ses",
+  section: "sec",
+  email: "ema",
+};
+
 beforeEach(() => {
   ddbMockClient.reset();
 });
 
 describe("Delete Tracking Endpoint", () => {
   test("deleteTracking helper returns true when ddb client resolves", async () => {
-    const deleteTrackingInput = {
-      department: "dep",
-      number: "num",
-      session: "ses",
-      section: "sec",
-      email: "ema",
-    };
-
     ddbMockClient.on(DeleteItemCommand).resolvesOnce({});
 
     const successfullyDeletedTracking = await deleteTracking(
@@ -28,14 +28,6 @@ describe("Delete Tracking Endpoint", () => {
   });
 
   test("deleteTracking helper returns false when ddb client rejects", async () => {
-    const deleteTrackingInput = {
-      department: "dep",
-      number: "num",
-      session: "ses",
-      section: "sec",
-      email: "ema",
-    };
-
     ddbMockClient.on(DeleteItemCommand).rejectsOnce({});
 
     const successfullyDeletedTracking = await deleteTracking(
