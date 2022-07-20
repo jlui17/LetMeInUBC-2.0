@@ -1,38 +1,54 @@
-import { DynamoDB } from 'aws-sdk';
+import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
 
 interface createTrackingInput {
-    session: string,
-    email: string,
-    department: string,
-    number: string,
-    restricted: string,
-    section: string,
-    description: string
+  session: string;
+  email: string;
+  department: string;
+  number: string;
+  restricted: string;
+  section: string;
+  description: string;
 }
 
-const TRACKING_TABLE_NAME: string = process.env.TRACKING_TABLE_NAME ? process.env.TRACKING_TABLE_NAME : "";
+const TRACKING_TABLE_NAME: string = process.env.TRACKING_TABLE_NAME
+  ? process.env.TRACKING_TABLE_NAME
+  : "";
 
-export const createTracking = async (event: createTrackingInput): Promise<boolean> => {
-    const db = new DynamoDB.DocumentClient();
-    const { department, section, number, session, email, restricted, description } = event;
-    const courseName = `${session} ${department} ${number} ${section}`
+export const createTracking = async (
+  event: createTrackingInput
+): Promise<boolean> => {
+  const ddbClient = new DynamoDBClient({});
+  const {
+    department,
+    section,
+    number,
+    session,
+    email,
+    restricted,
+    description,
+  } = event;
 
-    let response: boolean = true;
+  const courseName = `${session} ${department} ${number} ${section}`;
 
-    await db.put({
-        TableName: TRACKING_TABLE_NAME,
-        Item: {
-            courseName: courseName,
-            email: email,
-            includeRestrictedSeats: restricted,
-            department: department,
-            section: section,
-            number: number,
-            session: session,
-            description: description
+  const putRequest = new PutItemCommand({
+    TableName: TRACKING_TABLE_NAME,
+    Item: {
+      courseName: { S: courseName },
+      email: { S: email },
+      includeRestrictedSeats: { S: restricted },
+      department: { S: department },
+      section: { S: section },
+      number: { S: number },
+      session: { S: session },
+      description: { S: description },
+    },
+  });
 
-        },
-    }).promise().catch(error => { response = false });
+  let response: boolean = true;
 
-    return response;
-}
+  await ddbClient.send(putRequest).catch((error) => {
+    response = false;
+  });
+
+  return response;
+};
