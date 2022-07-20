@@ -11,9 +11,14 @@ export class LetMeInUbc20PipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const source = CodePipelineSource.gitHub("jlui17/LetMeInUBC-2.0", "main", {
-      authentication: SecretValue.secretsManager("GITHUB_ACCESS_TOKEN_SECRET"),
-    });
+    const source = CodePipelineSource.connection(
+      "jlui17/LetMeInUBC-2.0",
+      "main",
+      {
+        connectionArn:
+          "arn:aws:codestar-connections:us-west-2:284333539126:connection/ea2b465e-ba0f-4211-a078-e9e5c4db1289",
+      }
+    );
 
     const pipeline = new CodePipeline(this, "LetMeInUBC-Pipeline", {
       pipelineName: "LetMeInUBC-Deployment-Pipeline",
