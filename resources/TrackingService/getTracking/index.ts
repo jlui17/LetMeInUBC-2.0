@@ -40,9 +40,14 @@ exports.handler = async (event: any): Promise<any> => {
 
       const getTrackingByEmailInput = { email: email };
 
+      let hasErrored = false;
       const courses: string[] = await getTrackingByEmail(
         getTrackingByEmailInput
-      );
+      ).catch((error) => {
+        hasErrored = true;
+        return error;
+      });
+      if (hasErrored) return courses;
 
       if (courses.length === 0)
         return {
