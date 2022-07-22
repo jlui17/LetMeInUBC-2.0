@@ -1,17 +1,19 @@
-import { Lambda } from 'aws-sdk';
+import {
+  InvocationResponse,
+  InvokeCommand,
+  LambdaClient,
+} from "@aws-sdk/client-lambda";
 
-const invokeLambdaAndGetData = async (params: Lambda.InvocationRequest): Promise<string[]> => {
-  const invokeLambda = (params: Lambda.InvocationRequest) => {
-    const lambda = new Lambda();
+const getDataFromLambdaResponse = (response: InvocationResponse): string => {
+  return response.Payload?.toString() || "";
+};
 
-    return lambda.invoke(params).promise();
-  };
+export const invokeLambdaAndGetData = async (
+  invokeRequest: InvokeCommand
+): Promise<any> => {
+  const lambdaClient = new LambdaClient({});
 
-  const getDataFromLambdaResponse = (response: Lambda.InvocationResponse): string => {
-    return response.Payload ? response.Payload?.toString() : "";
-  }
-
-  const response = await invokeLambda(params);
+  const response = await lambdaClient.send(invokeRequest);
 
   return JSON.parse(getDataFromLambdaResponse(response));
 };

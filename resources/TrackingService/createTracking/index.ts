@@ -1,27 +1,8 @@
-import { Lambda } from "aws-sdk";
+import { InvokeCommand } from "@aws-sdk/client-lambda";
 import { CORS_ORIGIN_HEADER } from "../../shared/Constants";
+import { invokeLambdaAndGetData } from "../../shared/InvokeLambda";
 import { getCourseDataIfAvailable } from "../getTracking/getCourseDataIfAvailable";
 import { createTracking } from "./CreateTracking";
-
-const invokeLambdaAndGetData = async (
-  params: Lambda.InvocationRequest
-): Promise<any> => {
-  const invokeLambda = (params: Lambda.InvocationRequest) => {
-    const lambda = new Lambda();
-
-    return lambda.invoke(params).promise();
-  };
-
-  const getDataFromLambdaResponse = (
-    response: Lambda.InvocationResponse
-  ): string => {
-    return response.Payload ? response.Payload?.toString() : "";
-  };
-
-  const response = await invokeLambda(params);
-
-  return JSON.parse(getDataFromLambdaResponse(response));
-};
 
 const GET_COURSE_DATA_FUNCTION_NAME = process.env.GET_COURSE_DATA_FUNCTION_NAME
   ? process.env.GET_COURSE_DATA_FUNCTION_NAME
@@ -42,13 +23,13 @@ exports.handler = async (event: any): Promise<any> => {
       session: session,
     };
 
-    const getCourseDataInvokeParams = {
+    const getCourseDataRequest: InvokeCommand = new InvokeCommand({
       FunctionName: GET_COURSE_DATA_FUNCTION_NAME,
       Payload: Buffer.from(JSON.stringify(getCourseDataParams)),
-    };
+    });
 
     const courseDataFromWebsite = await invokeLambdaAndGetData(
-      getCourseDataInvokeParams
+      getCourseDataRequest
     );
 
     if (courseDataFromWebsite.error) {
