@@ -32,10 +32,18 @@ exports.handler = async (event: any): Promise<any> => {
       getCourseDataRequest
     );
 
+    if (courseDataFromWebsite instanceof Error) {
+      return {
+        statusCode: 500,
+        headers: { ...CORS_ORIGIN_HEADER },
+        body: courseDataFromWebsite,
+      };
+    }
+
     if (courseDataFromWebsite.error) {
       return {
         statusCode: 404,
-        headers: { "Access-Control-Allow-Origin": "*" },
+        headers: { ...CORS_ORIGIN_HEADER },
         body: courseDataFromWebsite.error,
       };
     }
