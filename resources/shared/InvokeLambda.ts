@@ -5,11 +5,7 @@ import {
 } from "@aws-sdk/client-lambda";
 
 const getDataFromLambdaResponse = (response: InvocationResponse): string => {
-  const payloadAsString = response.Payload?.toString() || "";
-  const isJson = payloadAsString.length > 0 && payloadAsString[0] === "{";
-  if (isJson) return JSON.parse(payloadAsString);
-
-  return payloadAsString;
+  return response.Payload?.toString() || "";
 };
 
 export const invokeLambdaAndGetData = async (
@@ -17,11 +13,7 @@ export const invokeLambdaAndGetData = async (
 ): Promise<any> => {
   const lambdaClient = new LambdaClient({});
 
-  try {
-    const response = await lambdaClient.send(invokeRequest);
+  const response = await lambdaClient.send(invokeRequest);
 
-    return getDataFromLambdaResponse(response);
-  } catch (error) {
-    return error;
-  }
+  return JSON.parse(getDataFromLambdaResponse(response));
 };
