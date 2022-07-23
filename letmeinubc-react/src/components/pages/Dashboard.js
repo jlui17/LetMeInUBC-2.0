@@ -1,7 +1,7 @@
-import { React, useState, useEffect, Fragment } from "react";
-import SideBar from "../SideBar";
-import jwt_decode from "jwt-decode";
 import { Dialog, Transition } from "@headlessui/react";
+import jwt_decode from "jwt-decode";
+import { Fragment, useEffect, useState } from "react";
+import SideBar from "../SideBar";
 
 export default function Dashboard(loginToken) {
   const [open, setOpen] = useState(false);
@@ -14,11 +14,9 @@ export default function Dashboard(loginToken) {
 
   const api_gateway_id = "q9nw3i29w0";
 
-  
   if (!loginToken.loginToken) {
     window.location.replace("https://letmeinubc.com/");
   }
-    
 
   useEffect(() => {
     setToken(loginToken.loginToken);
@@ -28,20 +26,21 @@ export default function Dashboard(loginToken) {
     getCourses();
   }, [token]);
 
-    useEffect(() => {
-      console.log("chnage")
+  useEffect(() => {
+    console.log("chnage");
     handleUpdateList(courses);
-  }, [ courses]);
-
+  }, [courses]);
 
   // Updates Dashboard courses list
-    const handleUpdateList = (courses) => {
-        console.log("updating:" + JSON.stringify(courses));
+  const handleUpdateList = (courses) => {
+    console.log("updating:" + JSON.stringify(courses));
     if (courses) {
       setCourseList(
         courses.map((course) => (
-            <li className="text-lg font-medium font-sans text-gray-700 hover:outline hover:outline-1 py-2 my-2 mx-2 rounded-lg"
-            key={course.S.name + " " + course.S.restricted}>
+          <li
+            className="text-lg font-medium font-sans text-gray-700 hover:outline hover:outline-1 py-2 my-2 mx-2 rounded-lg"
+            key={course.name.S + " " + course.restricted.S}
+          >
             <label
               className="form-check-label text-gray-800 grid grid-cols-12"
               for="delete"
@@ -50,29 +49,29 @@ export default function Dashboard(loginToken) {
                 className="col-span-1 form-check-input appearance-none ml-2 h-5 w-5 border rounded-md border-ubc-grey bg-white checked:bg-ubc-blue focus:outline-none transition duration-200 mt-1 align-baseline bg-no-repeat bg-center bg-contain float-left cursor-pointer"
                 type="checkbox"
                 value=""
-                id={course.S.name + " " + course.S.restricted}
+                id={course.S.name + " " + course.restricted.S}
               />
-              <span className="col-span-1">{course.S.department}</span>
-              <span className="col-span-1 pl-2">{course.S.number}</span>
-              <span className="col-span-1 pl-2">{course.S.section}</span>
-              <span className="col-span-1 pl-3">{course.S.session}</span>
+              <span className="col-span-1">{course.department.S}</span>
+              <span className="col-span-1 pl-2">{course.number.S}</span>
+              <span className="col-span-1 pl-2">{course.section.S}</span>
+              <span className="col-span-1 pl-3">{course.session.S}</span>
               <span className="col-span-2">
-                {course.S.restricted === "true"
+                {course.restricted.S === "true"
                   ? "Restricted & General"
                   : "General Only"}
               </span>
-              <span className=" col-span-5">{course.S.description}</span>
+              <span className=" col-span-5">{course.description.S}</span>
             </label>
           </li>
         ))
       );
     }
-      setCourseLoading(false);
+    setCourseLoading(false);
   };
 
   // API call to get user's courses from dynamodb based on email. Updates [courses] with returned data - this will trigger handleUpdateList.
-    async function getCourses() {
-      setCourseLoading(true);
+  async function getCourses() {
+    setCourseLoading(true);
 
     const email = jwt_decode(token).email;
 
@@ -90,7 +89,6 @@ export default function Dashboard(loginToken) {
       .then((data) => {
         setCourses(data);
       });
-
   }
 
   // API call to add course to tracking table
@@ -131,16 +129,14 @@ export default function Dashboard(loginToken) {
 
     return 200;
   };
-    
-    
 
   // API call to delete course from tracking table
-    async function deleteSelectedTracking() {
+  async function deleteSelectedTracking() {
     setDeleteLoading(true);
     var items = document.querySelectorAll("input[type=checkbox]:checked");
     for (var i = 0; i < items.length; i++) {
-        let deleteArray = items[i].id.replace(/\s+/g, " ").trim().split(" ");
-        console.log(deleteArray);
+      let deleteArray = items[i].id.replace(/\s+/g, " ").trim().split(" ");
+      console.log(deleteArray);
       const response = await fetch(
         `https://${api_gateway_id}.execute-api.us-west-2.amazonaws.com/v1/tracking`,
         {
@@ -157,18 +153,18 @@ export default function Dashboard(loginToken) {
             email: jwt_decode(token).email,
           }),
         }
-      ).then((response) => {console.log( "Successfully deleted course" )});
+      ).then((response) => {
+        console.log("Successfully deleted course");
+      });
     }
     getCourses();
     setDeleteLoading(false);
     setCourseLoading(true);
-       
   }
 
   function trim(myString) {
     return myString.replace(/^\s+|\s+$/g, "");
   }
-
 
   return (
     <>
