@@ -41,7 +41,7 @@ export default function Dashboard(loginToken) {
       setCourseList(
         courses.map((course) => (
             <li className="text-lg font-medium font-sans text-gray-700 hover:outline hover:outline-1 py-2 my-2 mx-2 rounded-lg"
-            key={course.name + " " + course.restricted}>
+            key={course.S.name + " " + course.S.restricted}>
             <label
               className="form-check-label text-gray-800 grid grid-cols-12"
               for="delete"
@@ -50,18 +50,18 @@ export default function Dashboard(loginToken) {
                 className="col-span-1 form-check-input appearance-none ml-2 h-5 w-5 border rounded-md border-ubc-grey bg-white checked:bg-ubc-blue focus:outline-none transition duration-200 mt-1 align-baseline bg-no-repeat bg-center bg-contain float-left cursor-pointer"
                 type="checkbox"
                 value=""
-                id={course.name + " " + course.restricted}
+                id={course.S.name + " " + course.S.restricted}
               />
-              <span className="col-span-1">{course.department}</span>
-              <span className="col-span-1 pl-2">{course.number}</span>
-              <span className="col-span-1 pl-2">{course.section}</span>
-              <span className="col-span-1 pl-3">{course.session}</span>
+              <span className="col-span-1">{course.S.department}</span>
+              <span className="col-span-1 pl-2">{course.S.number}</span>
+              <span className="col-span-1 pl-2">{course.S.section}</span>
+              <span className="col-span-1 pl-3">{course.S.session}</span>
               <span className="col-span-2">
-                {course.restricted === "true"
+                {course.S.restricted === "true"
                   ? "Restricted & General"
                   : "General Only"}
               </span>
-              <span className=" col-span-5">{course.description}</span>
+              <span className=" col-span-5">{course.S.description}</span>
             </label>
           </li>
         ))
