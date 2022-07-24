@@ -27,7 +27,7 @@ export default function Dashboard(loginToken) {
   }, [token]);
 
   useEffect(() => {
-    console.log("chnage");
+    console.log("change");
     handleUpdateList(courses);
   }, [courses]);
 
@@ -49,7 +49,7 @@ export default function Dashboard(loginToken) {
                 className="col-span-1 form-check-input appearance-none ml-2 h-5 w-5 border rounded-md border-ubc-grey bg-white checked:bg-ubc-blue focus:outline-none transition duration-200 mt-1 align-baseline bg-no-repeat bg-center bg-contain float-left cursor-pointer"
                 type="checkbox"
                 value=""
-                id={course.S.name + " " + course.restricted.S}
+                id={course.name.S + " " + course.restricted.S}
               />
               <span className="col-span-1">{course.department.S}</span>
               <span className="col-span-1 pl-2">{course.number.S}</span>
