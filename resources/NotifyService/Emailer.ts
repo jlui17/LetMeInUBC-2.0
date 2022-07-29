@@ -73,7 +73,7 @@ interface courseDict {
 
 exports.handler = async function (event: any) {
   const toNotify = event.data;
-  console.log(":: Input: " + JSON.stringify(toNotify));
+  console.log(":: Event Data: " + JSON.stringify(toNotify));
   for (let notifyDict of toNotify) {
     console.log(":: Notifying " + JSON.stringify(notifyDict) + "...");
     const emails: Array<string> = notifyDict["emails"];

@@ -77,32 +77,30 @@ exports.handler = async (event: any): Promise<any> => {
   // notify then remove tracking
   if (notifyArr.length > 0) {
     console.log(":: Notify Contacts: " + JSON.stringify(notifyArr));
-  }
-  params = {
-    FunctionName: NOTIFY_CONTACTS,
-    InvocationType: "RequestResponse",
-    Payload: JSON.stringify({
-      data: notifyArr,
-    }),
-    LogType: "Tail",
-  };
-  response = await lambda.invoke(params).promise();
+    params = {
+      FunctionName: NOTIFY_CONTACTS,
+      InvocationType: "RequestResponse",
+      Payload: JSON.stringify({
+        data: notifyArr,
+      }),
+      LogType: "Tail",
+    };
+    response = await lambda.invoke(params).promise();
 
-  if (notifyArr.length > 0) {
     console.log(":: Remove Tracking");
-  }
-  for (let entry of notifyArr) {
-    for (let email of entry["emails"]) {
-      const queryParams = entry["course"];
-      queryParams["email"] = email;
-      params = {
-        FunctionName: DELETE_TRACKING,
-        InvocationType: "RequestResponse",
-        Payload: JSON.stringify(queryParams),
-        LogType: "Tail",
-      };
-      console.log(":: Tracking removed:" + JSON.stringify(queryParams));
-      response = await lambda.invoke(params).promise();
+    for (let entry of notifyArr) {
+      for (let email of entry["emails"]) {
+        const queryParams = entry["course"];
+        queryParams["email"] = email;
+        params = {
+          FunctionName: DELETE_TRACKING,
+          InvocationType: "RequestResponse",
+          Payload: JSON.stringify(queryParams),
+          LogType: "Tail",
+        };
+        console.log(":: Tracking removed:" + JSON.stringify(queryParams));
+        response = await lambda.invoke(params).promise();
+      }
     }
   }
 
