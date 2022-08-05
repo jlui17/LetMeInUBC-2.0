@@ -58,7 +58,7 @@ export default function Account() {
             </div>
           </div>
 
-          <div className="flex justify-center items-center gap-x-8">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-y-8 sm:gap-y-0 sm:gap-x-8">
             <InfoWidget
               title="Register Now"
               icon={<HiCursorClick className="text-xl m-6 mt-0" />}
