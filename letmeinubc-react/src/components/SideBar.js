@@ -2,8 +2,8 @@ import { React, useState } from "react";
 import { NavLink } from "react-router-dom";
 
 function SideBar() {
-    const [dashboard, setDashboard] = useState(false);
-    const [about, setAbout] = useState(false);
+  const [dashboard, setDashboard] = useState(false);
+  const [about, setAbout] = useState(false);
   return (
     <>
       <nav className="my-5 mx-6 flex-row">
@@ -53,10 +53,9 @@ function SideBar() {
                   }
                   to="/account"
                 >
-                 
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className= "h-6 w-6 inline-block mr-2"
+                    className="h-6 w-6 inline-block mr-2"
                     viewBox="0 0 20 20"
                     fill="white"
                   >
@@ -66,7 +65,7 @@ function SideBar() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span className="text-white">account</span>
+                  <span className="text-white">Account</span>
                 </NavLink>
               </div>
             </li>
