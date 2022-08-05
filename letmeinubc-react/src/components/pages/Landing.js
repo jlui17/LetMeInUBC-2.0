@@ -60,60 +60,6 @@ export default function Account() {
               <p> 3. Get notified 📥 </p>
             </div>
           </div>
-
-          {/* team  */}
-          <div className="flex justify-center">
-            <p className="flex-inline pt-20 text-3xl font-semibold text-black">
-              Meet the team
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-5 px-12 sm:px-6 justify-center">
-            <div className="flex grid grid-rows-2 gap-6 px-6 justify-center text-center font-semibold text-sm pb-24">
-              <img
-                src="./logo512.png"
-                className="flex flex-col rounded-lg basis-32 w-full"
-                alt="headshot"
-              ></img>
-              <p className="sm:px-4">Justin Lui</p>
-            </div>
-
-            <div className="flex grid grid-rows-2 gap-6 px-6 justify-center text-center font-semibold text-sm pb-24">
-              <img
-                src="./logo512.png"
-                className="flex flex-col rounded-lg basis-32"
-                alt="headshot"
-              ></img>
-              <p className="sm:px-1">Lawrence Tang</p>
-            </div>
-
-            <div className="flex grid grid-rows-2 gap-6 px-6 justify-center text-center font-semibold text-sm pb-24">
-              <img
-                src="./logo512.png"
-                className="flex flex-col rounded-lg basis-32"
-                alt="headshot"
-              ></img>
-              <p className="sm:px-4">Kelvin Zhao</p>
-            </div>
-
-            <div className="flex grid grid-rows-2 gap-6 px-6 justify-center text-center font-semibold text-sm pb-24">
-              <img
-                src="./logo512.png"
-                className="flex flex-col rounded-lg basis-32"
-                alt="headshot"
-              ></img>
-              <p className="sm:px-3">William Chun</p>
-            </div>
-
-            <div className="flex grid grid-rows-2 gap-6 px-6 justify-center text-center font-semibold text-sm pb-24">
-              <img
-                src="./logo512.png"
-                className="flex flex-col rounded-lg basis-32 w-full"
-                alt="headshot"
-              ></img>
-              <p className="sm:px-2">Shannon Kao</p>
-            </div>
-          </div>
         </div>
       </div>
     </>
