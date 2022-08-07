@@ -49,6 +49,14 @@ export default function Account() {
             </div>
           </div>
 
+          <div className="flex flex-col items-center justify-center">
+            <h1 className="font-bold text-5xl mb-4">Courses are full?</h1>
+            <p className="text-xl">
+              Track a UBC courses seating and get notified when there's a seat
+              available for you. For <strong>free</strong>!
+            </p>
+          </div>
+
           <CoursesWidget />
 
           {/* how it works */}
@@ -73,14 +81,9 @@ export default function Account() {
             />
           </div>
 
-          {/* instructions dialog  */}
-          {/* <div class="flex justify-center bg-white rounded-xl ring-1 ring-cool-blue mx-auto rounded-lg px-10 max-w-sm">
-            <div class="py-8 space-y-3 text-lg leading-5 text-black-600">
-              <p> 1. Sign up </p>
-              <p> 2. Track a course </p>
-              <p> 3. Get notified 📥 </p>
-            </div>
-          </div> */}
+          <p className="flex justify-center">
+            Built by UBC students, free for all UBC students.
+          </p>
         </div>
       </div>
     </>
