@@ -49,8 +49,10 @@ export default function Account() {
             </div>
           </div>
 
-          <div className="flex flex-col items-center justify-center">
-            <h1 className="font-bold text-5xl mb-4">Courses are full?</h1>
+          <div className="flex flex-col items-center justify-center mb-4">
+            <h1 className="font-bold text-5xl mb-4 mt-8 sm:mt-0">
+              Courses are full?
+            </h1>
             <p className="text-xl">
               Track a UBC courses seating and get notified when there's a seat
               available for you. For <strong>free</strong>!
@@ -82,7 +84,7 @@ export default function Account() {
           </div>
 
           <p className="flex justify-center">
-            Built by UBC students, free for all UBC students.
+            Built by UBC students, free for everyone.
           </p>
         </div>
       </div>

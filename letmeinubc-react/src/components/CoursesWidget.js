@@ -1,8 +1,8 @@
 const CoursesWidget = () => {
   return (
-    <div className="flex items-end sm:items-center justify-center min-h-full p-4 text-center sm:p-0">
+    <div className="hidden sm:flex items-end sm:items-center justify-center min-h-full p-4 text-center sm:p-0">
       <div className="mt-5 md:mt-0 md:col-span-2">
-        <div className="shadow-xl overflow-hidden sm:rounded-md">
+        <div className="shadow-xl overflow-hidden sm:rounded-md mt-8 mb-8">
           <div className="px-4 py-5 bg-white sm:p-6">
             <div className="grid grid-cols-6 gap-6">
               <div className="col-span-6 sm:col-span-3 py-2">
