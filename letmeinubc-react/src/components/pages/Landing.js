@@ -59,7 +59,12 @@ export default function Account() {
             </p>
           </div>
 
-          <CoursesWidget />
+          <div className="hidden flex-col items-center justify-center sm:flex">
+            <CoursesWidget />
+            <p>
+              Register and sign-in to use!
+            </p>
+          </div>
 
           {/* how it works */}
           <div className="flex justify-center">
