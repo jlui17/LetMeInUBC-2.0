@@ -60,10 +60,8 @@ export default function Account() {
           </div>
 
           <div className="hidden flex-col items-center justify-center sm:flex">
+            <p>*The form below doesn't work. Register and sign-in to use!*</p>
             <CoursesWidget />
-            <p>
-              Register and sign-in to use!
-            </p>
           </div>
 
           {/* how it works */}
