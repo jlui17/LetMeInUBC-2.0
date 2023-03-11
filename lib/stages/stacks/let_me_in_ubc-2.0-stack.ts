@@ -23,7 +23,7 @@ import { RefreshAndNotifyService } from "../../services/RefreshAndNotifyService"
 import { TrackingService } from "../../services/TrackingService";
 import { WebService } from "../../services/WebService";
 
-const CURRENT_SCHOOL_YEAR = "2022";
+const CURRENT_SCHOOL_YEAR = "2023";
 const REFRESH_INTERVAL = Duration.minutes(5);
 const PAUSE_BETWEEN_REQUESTS = "0"; // seconds
 
