@@ -17,10 +17,10 @@ module.exports = {
     extend: {
       spacing: {
         128: "32rem",
-        
+
         "almost-screen": "90vh",
         "half-screen": "50vh",
-        "ListH": "40vh",
+        ListH: "40vh",
         f20: "20%",
         n2: "-12px",
       },
@@ -29,10 +29,12 @@ module.exports = {
         "ubc-grey": "#888888",
         "cool-blue": "#071547",
         "highlight-blue": "#273250",
-        
       },
       gridTemplateColumns: {
         14: "repeat(14, minmax(1fr))",
+      },
+      screens: {
+        sm: { max: "640px" },
       },
     },
   },

@@ -4,16 +4,19 @@ import { Fragment, useEffect, useState } from "react";
 import SideBar from "../SideBar";
 
 export default function Dashboard(loginToken) {
+  /* open state to show/hide modal*/
   const [open, setOpen] = useState(false);
   const [courses, setCourses] = useState([]);
   const [courseList, setCourseList] = useState([]);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [courseLoading, setCourseLoading] = useState(false);
+  /*Auth token scraped from URL*/
   const [token, setToken] = useState("");
 
   const api_gateway_id = "q9nw3i29w0";
 
+  /*ensures that auth token is present when on dashboard page*/
   if (!loginToken.loginToken) {
     window.location.replace("https://letmeinubc.com/");
   }
@@ -46,21 +49,31 @@ export default function Dashboard(loginToken) {
               for="delete"
             >
               <input
-                className="col-span-1 form-check-input appearance-none ml-2 h-5 w-5 border rounded-md border-ubc-grey bg-white checked:bg-ubc-blue focus:outline-none transition duration-200 mt-1 align-baseline bg-no-repeat bg-center bg-contain float-left cursor-pointer"
+                className="col-span-1 sm:col-span-2 sm:ml-4 form-check-input appearance-none ml-2 h-5 w-5 border rounded-md border-ubc-grey bg-white checked:bg-ubc-blue focus:outline-none transition duration-200 mt-1 align-baseline bg-no-repeat bg-center bg-contain float-left cursor-pointer"
                 type="checkbox"
                 value=""
                 id={course.name.S + " " + course.restricted.S}
               />
-              <span className="col-span-1">{course.department.S}</span>
-              <span className="col-span-1 pl-2">{course.number.S}</span>
-              <span className="col-span-1 pl-2">{course.section.S}</span>
-              <span className="col-span-1 pl-3">{course.session.S}</span>
-              <span className="col-span-2">
+              <span className="col-span-1 sm:col-span-2">
+                {course.department.S}
+              </span>
+              <span className="col-span-1 pl-2 sm:col-span-2">
+                {course.number.S}
+              </span>
+              <span className="col-span-1 pl-2 sm:col-span-2">
+                {course.section.S}
+              </span>
+              <span className="col-span-1 pl-3 sm:col-span-2">
+                {course.session.S}
+              </span>
+              <span className="col-span-2 sm:hidden">
                 {course.restricted.S === "true"
                   ? "Restricted & General"
                   : "General Only"}
               </span>
-              <span className=" col-span-5">{course.description.S}</span>
+              <span className="col-span-5 sm:hidden">
+                {course.description.S}
+              </span>
             </label>
           </li>
         ))
@@ -183,7 +196,7 @@ export default function Dashboard(loginToken) {
           </Transition.Child>
 
           <div className="fixed z-10 inset-0 overflow-y-auto">
-            <div className="flex items-end sm:items-center justify-center min-h-full p-4 text-center sm:p-0">
+            <div className="flex items-end sm:items-center justify-center min-h-full p-4 text-center sm:p-0 sm:mx-10">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -327,20 +340,20 @@ export default function Dashboard(loginToken) {
           </div>
         </Dialog>
       </Transition.Root>
-      <div className="flex my-10 mx-10 h-almost-screen">
-        <div className="basis-f20 rounded-l-xl bg-cool-blue">
+      <div className="flex my-10 mx-10 h-almost-screen sm:my-5 sm:mx-2">
+        <div className="basis-f20 rounded-l-xl bg-cool-blue sm:w-10">
           <SideBar />
         </div>
 
         <div className="basis-5/6 md:grid md:grid-cols-5 bg-white rounded-r-xl shadow-2xl">
-          <div className="mt-5 md:mt-0 md:col-span-4 ml-20">
-            <h1 className="text-5xl font-bold font-sans text-black my-16">
+          <div className="mt-5 md:mt-0 md:col-span-4 ml-20 sm:mx-5">
+            <h1 className="text-5xl font-bold font-sans text-black my-16 sm:text-3xl">
               {" "}
               UBC Course Tracker
             </h1>
 
             <div className="flex justify-between">
-              <span className="text-2xl font-sans font-bold inline-block">
+              <span className="text-2xl font-sans font-bold inline-block sm:text-xl">
                 My tracked courses
               </span>
               <div className="inline-block mb-2">
@@ -407,7 +420,7 @@ export default function Dashboard(loginToken) {
             </div>
 
             <div className=" overflow-hidden sm:rounded-lg border-ubc-blue border-solid border-2 h-ListH">
-              <div className="px-4 py-5 bg-white sm:p-6">
+              <div className="px-4 py-5 bg-white sm:p-6 sm:px-0">
                 <div className="">
                   <ul className="max-h-80 min-h-full overflow-auto overflow-y-scroll">
                     {!courseLoading && courseList}
