@@ -33,9 +33,6 @@ module.exports = {
       gridTemplateColumns: {
         14: "repeat(14, minmax(1fr))",
       },
-      screens: {
-        sm: { max: "640px" },
-      },
     },
   },
   plugins: [],
