@@ -333,7 +333,7 @@ export default function Dashboard(loginToken) {
         </Dialog>
       </Transition.Root>
       <div className="flex sm:my-10 sm:mx-10 h-almost-screen my-5 mx-2">
-        <div className="basis-f20 rounded-l-xl bg-cool-blue w-10 sm:w-full flex flex-col items-center">
+        <div className="basis-f20 rounded-l-xl bg-cool-blue w-10 sm:w-full">
           <SideBar />
         </div>
 
@@ -345,12 +345,12 @@ export default function Dashboard(loginToken) {
             </h1>
 
             <div className="flex justify-between">
-              <span className="sm:text-2xl font-sans font-bold inline-block text-xl">
+              <span className="lg:text-2xl font-sans font-bold inline-block text-xl">
                 My tracked courses
               </span>
               <div className="flex mb-2">
                 <button
-                  className="inline-block justify-center py-2 px-2 mr-1 border-solid border-ubc-blue border-2 shadow-sm text-lg font-sans font-lg rounded-md text-white hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="inline-block justify-center py-2 px-2 mr-2 border-solid border-ubc-blue border-2 shadow-sm text-lg font-sans font-lg rounded-md text-white hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={deleteSelectedTracking}
                   disabled={deleteLoading}
                 >
@@ -411,7 +411,7 @@ export default function Dashboard(loginToken) {
               </div>
             </div>
 
-            <div className="overflow-hidden sm:rounded-lg border-ubc-blue border-solid border-2 h-ListH">
+            <div className="overflow-hidden rounded-lg border-ubc-blue border-solid border-2 h-ListH">
               <div className="sm:px-4 bg-white px-0 mb-10">
                 <ul className=" max-h-72 min-h-full overflow-auto overflow-y-scroll">
                   {!courseLoading && courseList}

@@ -54,7 +54,7 @@ export default function Account() {
               Courses are full?
             </h1>
             <p className="text-xl">
-              Track a UBC courses seating and get notified when there's a seat
+              Track a UBC course and get notified when there's a seat
               available for you. For <strong>free</strong>!
             </p>
           </div>
