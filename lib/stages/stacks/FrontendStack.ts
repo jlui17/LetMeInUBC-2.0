@@ -13,7 +13,7 @@ export class FrontendStack extends Stack {
       indexDoc: "index.html",
       websiteFolder: "letmeinubc-react/build",
       certificateARN:
-        "arn:aws:acm:us-east-1:572648781471:certificate/95bd3abf-f81d-42b0-916f-f0398326dbbe",
+        "arn:aws:acm:us-east-1:572648781471:certificate/9ef5b6a6-9c1e-469e-9969-e6e080ba60df",
       cfAliases: ["www.letmeinubc.com", "letmeinubc.com"],
     });
 
