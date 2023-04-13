@@ -1,6 +1,7 @@
 import React from "react";
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
+import { API_GATEWAY_ID } from "../common/config";
 
 function RegistrationForm() {
   const [open, setOpen] = useState(false);
@@ -63,7 +64,7 @@ function RegistrationForm() {
     const session = info.session === "Winter" ? "W" : "S";
 
     const response = await fetch(
-      "https://witmeewq6e.execute-api.us-west-2.amazonaws.com/v1/tracking",
+      `https://${API_GATEWAY_ID}.execute-api.us-west-2.amazonaws.com/v1/tracking`,
       {
         method: "POST",
         headers: {

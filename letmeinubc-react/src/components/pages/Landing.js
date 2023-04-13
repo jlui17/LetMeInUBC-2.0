@@ -4,19 +4,16 @@ import { FaCheckSquare, FaBell } from "react-icons/fa";
 
 import InfoWidget from "../InfoWidget";
 import CoursesWidget from "../CoursesWidget";
+import { LOGIN_URL, SIGNUP_URL } from "../../common/config";
 
 export default function Account() {
   function login() {
-    window.location.replace(
-      "https://letmeinubc.auth.us-west-2.amazoncognito.com/login?client_id=3e2v22r2pfjoc3sokp8lj05la1&response_type=token&scope=openid&redirect_uri=https://letmeinubc.com/dashboard"
-    );
+    window.location.replace(LOGIN_URL);
     return null;
   }
 
   function register() {
-    window.location.replace(
-      "https://letmeinubc.auth.us-west-2.amazoncognito.com/signup?client_id=3e2v22r2pfjoc3sokp8lj05la1&response_type=token&scope=openid&redirect_uri=https://letmeinubc.com/dashboard"
-    );
+    window.location.replace(SIGNUP_URL);
     return null;
   }
   return (
@@ -54,8 +51,8 @@ export default function Account() {
               Courses are full?
             </h1>
             <p className="text-xl">
-              Track a UBC course and get notified when there's a seat
-              available for you. For <strong>free</strong>!
+              Track a UBC course and get notified when there's a seat available
+              for you. For <strong>free</strong>!
             </p>
           </div>
 

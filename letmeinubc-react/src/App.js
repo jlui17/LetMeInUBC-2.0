@@ -3,15 +3,12 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Landing from "./components/pages/Landing";
 import Dashboard from "./components/pages/Dashboard";
 import Account from "./components/pages/Account";
-import Beta from "./Beta";
-import SideBar from "./components/SideBar";
+import { LOGIN_URL } from "./common/config";
 
 function App() {
   // Redirect to login if token is not found
   function login() {
-    window.location.replace(
-      "https://letmeinubc.auth.us-west-2.amazoncognito.com/login?client_id=3e2v22r2pfjoc3sokp8lj05la1&response_type=token&scope=openid&redirect_uri=https://letmeinubc.com/dashboard"
-    );
+    window.location.replace(LOGIN_URL);
     return null;
   }
   let tokenLogin;
@@ -20,11 +17,10 @@ function App() {
 
   try {
     tokenLogin = window.location.href.split("=")[1].split("&"[0])[0];
-   
 
     console.log("loging");
   } catch (e) {
-    console.log("not Logged in")
+    console.log("not Logged in");
   }
 
   console.log("this is");
@@ -35,7 +31,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/account" element={<Account />} />
-          <Route path="/dashboard" element={<Dashboard loginToken={tokenLogin} />} />
+          <Route
+            path="/dashboard"
+            element={<Dashboard loginToken={tokenLogin} />}
+          />
         </Routes>
       </Router>
     </>

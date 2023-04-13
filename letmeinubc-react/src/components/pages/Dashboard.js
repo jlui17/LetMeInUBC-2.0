@@ -2,6 +2,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import jwt_decode from "jwt-decode";
 import { Fragment, useEffect, useState } from "react";
 import SideBar from "../SideBar";
+import { API_GATEWAY_ID } from "../../common/config";
 
 export default function Dashboard(loginToken) {
   /* open state to show/hide modal*/
@@ -13,8 +14,6 @@ export default function Dashboard(loginToken) {
   const [courseLoading, setCourseLoading] = useState(false);
   /*Auth token scraped from URL*/
   const [token, setToken] = useState("");
-
-  const api_gateway_id = "q9nw3i29w0";
 
   /*ensures that auth token is present when on dashboard page*/
   if (!loginToken.loginToken) {
@@ -81,7 +80,7 @@ export default function Dashboard(loginToken) {
     const email = jwt_decode(token).email;
 
     const getCourse = await fetch(
-      `https://${api_gateway_id}.execute-api.us-west-2.amazonaws.com/v1/tracking?key=email&email=${email}`,
+      `https://${API_GATEWAY_ID}.execute-api.us-west-2.amazonaws.com/v1/tracking?key=email&email=${email}`,
       {
         method: "GET",
         headers: {
@@ -106,7 +105,7 @@ export default function Dashboard(loginToken) {
     const email = jwt_decode(token).email;
 
     const response = await fetch(
-      `https://${api_gateway_id}.execute-api.us-west-2.amazonaws.com/v1/tracking`,
+      `https://${API_GATEWAY_ID}.execute-api.us-west-2.amazonaws.com/v1/tracking`,
       {
         method: "POST",
         headers: {
@@ -143,7 +142,7 @@ export default function Dashboard(loginToken) {
       let deleteArray = items[i].id.replace(/\s+/g, " ").trim().split(" ");
       console.log(deleteArray);
       const response = await fetch(
-        `https://${api_gateway_id}.execute-api.us-west-2.amazonaws.com/v1/tracking`,
+        `https://${API_GATEWAY_ID}.execute-api.us-west-2.amazonaws.com/v1/tracking`,
         {
           method: "DELETE",
           headers: {
