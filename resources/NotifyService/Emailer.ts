@@ -48,7 +48,7 @@ const sendEmail = async function (
   var mailOptions = {
     from: "letmeinubc@gmail.com",
     to: emails.join(", "),
-    subject: `Let Me In UBC: A seat has opened up for ${title}`,
+    subject: `LetMeInUBC: A seat has opened up for ${title}`,
     text: `There is a ${
       restricted ? `restricted ` : ``
     }seat available for ${title} - ${description}\n\n${courseURL}`,
