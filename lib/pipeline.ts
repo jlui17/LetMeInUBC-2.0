@@ -16,7 +16,7 @@ export class LetMeInUbc20PipelineStack extends Stack {
       "main",
       {
         connectionArn:
-          "arn:aws:codestar-connections:us-west-2:284333539126:connection/ea2b465e-ba0f-4211-a078-e9e5c4db1289",
+          "arn:aws:codestar-connections:us-west-2:572648781471:connection/62fa4e4b-fada-4f32-a7b9-67757163a5d9",
       }
     );
 

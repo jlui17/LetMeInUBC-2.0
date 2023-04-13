@@ -7,7 +7,14 @@ import * as path from "path";
 export class NotifyService extends Construct {
   public readonly handler: lambda.Function;
 
-  constructor(scope: Construct, id: string, props: any) {
+  constructor(
+    scope: Construct,
+    id: string,
+    props: {
+      CURRENT_SCHOOL_YEAR: string;
+      EMAILER_PASSWORD: string;
+    }
+  ) {
     super(scope, id);
 
     this.handler = new NodejsFunction(this, "RefreshAndNotify", {
@@ -18,7 +25,7 @@ export class NotifyService extends Construct {
       environment: {
         CURRENT_SCHOOL_YEAR: props.CURRENT_SCHOOL_YEAR,
         EMAILER_USER: "letmeinubc@gmail.com",
-        EMAILER_PASS: "txzewgdzysmyypgb",
+        EMAILER_PASS: props.EMAILER_PASSWORD,
       },
     });
   }

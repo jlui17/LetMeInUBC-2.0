@@ -1,22 +1,18 @@
-import { CfnOutput, Duration, Stack, StackProps } from "aws-cdk-lib";
+import { CfnOutput, Duration, Stack } from "aws-cdk-lib";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import {
   AuthorizationType,
   CognitoUserPoolsAuthorizer,
   MethodLoggingLevel,
 } from "aws-cdk-lib/aws-apigateway";
-import {
-  OAuthScope,
-  UserPool,
-  VerificationEmailStyle,
-} from "aws-cdk-lib/aws-cognito";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
-import { SPADeploy } from "cdk-spa-deploy";
 import { Construct } from "constructs";
 
+import { UserPool } from "aws-cdk-lib/aws-cognito";
 import * as events from "aws-cdk-lib/aws-events";
 import * as targets from "aws-cdk-lib/aws-events-targets";
 import * as iam from "aws-cdk-lib/aws-iam";
+import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 import { WEBSITE_URL } from "../../../resources/shared/Constants";
 import { NotifyService } from "../../services/NotifyService";
 import { RefreshAndNotifyService } from "../../services/RefreshAndNotifyService";
@@ -27,65 +23,23 @@ const CURRENT_SCHOOL_YEAR = "2023";
 const REFRESH_INTERVAL = Duration.minutes(5);
 const PAUSE_BETWEEN_REQUESTS = "0"; // seconds
 
-export class LetMeInUbc20Stack extends Stack {
+export class ApiStack extends Stack {
   public readonly apiEndpoint: CfnOutput;
-  public readonly websiteUrl: CfnOutput;
-  public readonly clientID: CfnOutput;
 
-  constructor(scope: Construct, id: string, props?: StackProps) {
-    super(scope, id, props);
+  constructor(
+    scope: Construct,
+    id: string,
+    props: {
+      userPool: UserPool;
+    }
+  ) {
+    super(scope, id);
 
-    //Create Cognito User Pool
-    const pool = new UserPool(this, "MyPool", {
-      selfSignUpEnabled: true,
-      signInAliases: {
-        email: true,
-      },
-      autoVerify: {
-        email: true,
-      },
-
-      userVerification: {
-        emailSubject: "Verify email for LetMeInUBC",
-        emailBody:
-          "Thanks for signing up for LetMeInUBC! Your verification code is {####}",
-        emailStyle: VerificationEmailStyle.CODE,
-        smsMessage:
-          "Thanks for signing up for LetMeInUBC! Your verification code is {####}",
-      },
-    });
-
-    //Create SPA - Cloudfront-SPA for in-built https support, deploy first to get URL
-    const spa_app = new SPADeploy(this, "spaDeploy").createSiteWithCloudfront({
-      indexDoc: "index.html",
-      websiteFolder: "letmeinubc-react/build",
-      certificateARN:
-        "arn:aws:acm:us-east-1:284333539126:certificate/24d8066b-bc55-4146-be81-09ed591b064f",
-      cfAliases: ["letmeinubc.com"],
-    });
-    this.websiteUrl = new CfnOutput(this, "LetMeInUBC-Website-URL", {
-      value: WEBSITE_URL,
-    });
-    this.clientID = new CfnOutput(this, "LetMeInUBC-Client-ID", {
-      value: pool.userPoolId,
-    });
-
-    // Create App client for authorization
-    pool.addClient("app-client", {
-      oAuth: {
-        flows: {
-          implicitCodeGrant: true, //generates JWT
-        },
-        scopes: [OAuthScope.OPENID],
-        callbackUrls: [`${this.websiteUrl.value}/dashboard`], //Must begin with HTTPS else Validation Error
-      },
-    });
-
-    pool.addDomain("LetMeInUBC", {
-      cognitoDomain: {
-        domainPrefix: "letmeinubc",
-      },
-    });
+    const CONFIG = Secret.fromSecretNameV2(
+      this,
+      "NotifyService_CONFIG_SECRET",
+      "CONFIG"
+    );
 
     const api = new apigateway.RestApi(this, "LetMeIn-API", {
       defaultCorsPreflightOptions: {
@@ -98,7 +52,7 @@ export class LetMeInUbc20Stack extends Stack {
         ],
         allowMethods: ["GET", "POST", "DELETE"],
         allowCredentials: true,
-        allowOrigins: [this.websiteUrl.value],
+        allowOrigins: [WEBSITE_URL],
       },
 
       deployOptions: {
@@ -115,7 +69,7 @@ export class LetMeInUbc20Stack extends Stack {
       this,
       "CoursesAPIAuthorizer",
       {
-        cognitoUserPools: [pool],
+        cognitoUserPools: [props.userPool],
       }
     );
 
@@ -176,6 +130,8 @@ export class LetMeInUbc20Stack extends Stack {
 
     const notifyService = new NotifyService(this, "NotifyService", {
       CURRENT_SCHOOL_YEAR: CURRENT_SCHOOL_YEAR,
+      EMAILER_PASSWORD:
+        CONFIG.secretValueFromJson("EMAILER_PASSWORD").unsafeUnwrap(),
     });
     notifyService.handler.addToRolePolicy(
       new iam.PolicyStatement({
