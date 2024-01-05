@@ -21,7 +21,7 @@ import { WebService } from "../../services/WebService";
 
 const CURRENT_SCHOOL_YEAR = "2023";
 const REFRESH_INTERVAL = Duration.minutes(5);
-const PAUSE_BETWEEN_REQUESTS = "0"; // seconds
+const PAUSE_BETWEEN_REQUESTS = "0.5"; // seconds
 
 export class ApiStack extends Stack {
   public readonly apiEndpoint: CfnOutput;

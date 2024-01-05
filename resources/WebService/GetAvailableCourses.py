@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 CURRENT_SCHOOL_YEAR = int(os.environ['CURRENT_SCHOOL_YEAR'])
-PAUSE_BETWEEN_REQUESTS = int(os.environ['PAUSE_BETWEEN_REQUESTS'])
+PAUSE_BETWEEN_REQUESTS = float(os.environ['PAUSE_BETWEEN_REQUESTS'])
 SECTION_URL_TEMPLATE = "https://courses.students.ubc.ca/cs/courseschedule?" \
                        "sesscd={}&pname=subjarea&tname=subj-section&sessyr={}&dept={}&course={}&section={}"
 
