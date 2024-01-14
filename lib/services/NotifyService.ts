@@ -18,7 +18,6 @@ export class NotifyService extends Construct {
     super(scope, id);
 
     this.handler = new NodejsFunction(this, "RefreshAndNotify", {
-      runtime: lambda.Runtime.NODEJS_14_X,
       handler: "handler",
       entry: path.join(__dirname, "/../../resources/NotifyService/Emailer.ts"),
       timeout: cdk.Duration.minutes(5),
