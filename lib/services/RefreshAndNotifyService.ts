@@ -9,12 +9,8 @@ export class RefreshAndNotifyService extends Construct {
 
   constructor(scope: Construct, id: string, props: any) {
     super(scope, id);
-    const RESOURCE_FOLDER = lambda.Code.fromAsset(
-      "resources/RefreshAndNotifyService"
-    );
 
     this.handler = new NodejsFunction(this, "RefreshAndNotify", {
-      runtime: lambda.Runtime.NODEJS_14_X,
       handler: "handler",
       entry: path.join(
         __dirname,

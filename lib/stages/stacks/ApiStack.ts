@@ -13,7 +13,6 @@ import * as events from "aws-cdk-lib/aws-events";
 import * as targets from "aws-cdk-lib/aws-events-targets";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Secret } from "aws-cdk-lib/aws-secretsmanager";
-import { WEBSITE_URL } from "../../../resources/shared/Constants";
 import { NotifyService } from "../../services/NotifyService";
 import { RefreshAndNotifyService } from "../../services/RefreshAndNotifyService";
 import { TrackingService } from "../../services/TrackingService";
@@ -21,7 +20,7 @@ import { WebService } from "../../services/WebService";
 
 const CURRENT_SCHOOL_YEAR = "2023";
 const REFRESH_INTERVAL = Duration.minutes(5);
-const PAUSE_BETWEEN_REQUESTS = "0.5"; // seconds
+const PAUSE_BETWEEN_REQUESTS = "0.85"; // seconds
 
 export class ApiStack extends Stack {
   public readonly apiEndpoint: CfnOutput;
@@ -52,7 +51,7 @@ export class ApiStack extends Stack {
         ],
         allowMethods: ["GET", "POST", "DELETE"],
         allowCredentials: true,
-        allowOrigins: [WEBSITE_URL],
+        allowOrigins: ["*"],
       },
 
       deployOptions: {
