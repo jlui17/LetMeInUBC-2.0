@@ -37,7 +37,7 @@ export class ApiStack extends Stack {
       this,
       "NotifyService_CONFIG_SECRET",
       "CONFIG"
-    ); // update pls
+    );
 
     const api = new apigateway.RestApi(this, "LetMeIn-API", {
       defaultCorsPreflightOptions: {
@@ -50,7 +50,7 @@ export class ApiStack extends Stack {
         ],
         allowMethods: ["GET", "POST", "DELETE"],
         allowCredentials: true,
-        allowOrigins: ["*"],
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
       },
 
       deployOptions: {
