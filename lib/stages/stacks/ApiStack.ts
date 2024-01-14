@@ -5,7 +5,6 @@ import {
   CognitoUserPoolsAuthorizer,
   MethodLoggingLevel,
 } from "aws-cdk-lib/aws-apigateway";
-import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
 
 import { UserPool } from "aws-cdk-lib/aws-cognito";
@@ -77,27 +76,7 @@ export class ApiStack extends Stack {
       PAUSE_BETWEEN_REQUESTS: PAUSE_BETWEEN_REQUESTS,
     });
 
-    const trackingTable = new dynamodb.Table(this, "Tracking", {
-      partitionKey: { name: "courseName", type: dynamodb.AttributeType.STRING },
-      sortKey: { name: "email", type: dynamodb.AttributeType.STRING },
-    });
-    trackingTable.addGlobalSecondaryIndex({
-      indexName: "emailIndex",
-      partitionKey: { name: "email", type: dynamodb.AttributeType.STRING },
-      sortKey: { name: "courseName", type: dynamodb.AttributeType.STRING },
-    });
-    trackingTable.addGlobalSecondaryIndex({
-      indexName: "courseIndex",
-      partitionKey: { name: "courseName", type: dynamodb.AttributeType.STRING },
-      sortKey: {
-        name: "includeRestrictedSeats",
-        type: dynamodb.AttributeType.STRING,
-      },
-    });
     const trackingService = new TrackingService(this, "TrackingService", {
-      TRACKING_TABLE_NAME: trackingTable.tableName,
-      EMAIL_INDEX_NAME: "emailIndex",
-      COURSE_INDEX_NAME: "courseIndex",
       GET_COURSE_DATA_FUNCTION_NAME:
         webService.getCourseDataHandler.functionName,
     });
@@ -165,13 +144,6 @@ export class ApiStack extends Stack {
     const eventRule = new events.Rule(this, "scheduleRule", {
       schedule: events.Schedule.rate(REFRESH_INTERVAL),
     });
-
-    trackingTable.grantReadWriteData(trackingService.createEndpointHandler);
-    trackingTable.grantReadData(trackingService.getEndpointHandler);
-    trackingTable.grantReadData(trackingService.getByCourseHandler);
-    trackingTable.grantReadData(trackingService.getByAllCoursesHandler);
-    trackingTable.grantWriteData(trackingService.deleteHandler);
-    trackingTable.grantWriteData(trackingService.deleteEndpointHandler);
 
     webService.getCourseDataHandler.grantInvoke(
       trackingService.createEndpointHandler
