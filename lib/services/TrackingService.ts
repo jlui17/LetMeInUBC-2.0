@@ -1,7 +1,8 @@
+import { Stack } from "aws-cdk-lib";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
 
-export class TrackingService extends Construct {
+export class TrackingService extends Stack {
   public readonly createEndpointHandler: NodejsFunction;
   public readonly deleteEndpointHandler: NodejsFunction;
   public readonly deleteHandler: NodejsFunction;

@@ -1,9 +1,9 @@
 import * as lambda from "@aws-cdk/aws-lambda-python-alpha";
-import * as cdk from "aws-cdk-lib";
+import { Duration, Stack } from "aws-cdk-lib";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 
-export class WebService extends Construct {
+export class WebService extends Stack {
   public readonly getAvailableCoursesHandler: lambda.PythonFunction;
   public readonly getCourseDataHandler: lambda.PythonFunction;
 
@@ -26,7 +26,7 @@ export class WebService extends Construct {
         index: "GetAvailableCourses.py",
         handler: "handler",
         entry: RESOURCE_FOLDER,
-        timeout: cdk.Duration.minutes(5),
+        timeout: Duration.minutes(5),
         environment: {
           CURRENT_SCHOOL_YEAR: props.CURRENT_SCHOOL_YEAR,
           PAUSE_BETWEEN_REQUESTS: props.PAUSE_BETWEEN_REQUESTS,
@@ -43,7 +43,7 @@ export class WebService extends Construct {
         index: "GetCourseData.py",
         handler: "handler",
         entry: RESOURCE_FOLDER,
-        timeout: cdk.Duration.minutes(5),
+        timeout: Duration.minutes(5),
         environment: {
           CURRENT_SCHOOL_YEAR: props.CURRENT_SCHOOL_YEAR,
         },

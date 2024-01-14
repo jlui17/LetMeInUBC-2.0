@@ -1,10 +1,10 @@
-import * as cdk from "aws-cdk-lib";
+import { Duration, Stack } from "aws-cdk-lib";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
 import * as path from "path";
 
-export class NotifyService extends Construct {
+export class NotifyService extends Stack {
   public readonly handler: lambda.Function;
 
   constructor(
@@ -20,7 +20,7 @@ export class NotifyService extends Construct {
     this.handler = new NodejsFunction(this, "RefreshAndNotify", {
       handler: "handler",
       entry: path.join(__dirname, "/../../resources/NotifyService/Emailer.ts"),
-      timeout: cdk.Duration.minutes(5),
+      timeout: Duration.minutes(5),
       environment: {
         CURRENT_SCHOOL_YEAR: props.CURRENT_SCHOOL_YEAR,
         EMAILER_USER: "letmeinubc@gmail.com",
