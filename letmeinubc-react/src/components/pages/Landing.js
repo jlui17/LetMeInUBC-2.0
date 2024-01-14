@@ -29,7 +29,13 @@ export default function Account() {
 
             {/* two buttons  */}
             <div className="flex w-full justify-center sm:justify-end gap-4">
-              <div className="w-2/3 grid grid-rows-2 grid-cols-1 gap-2 sm:w-80 sm:pt-8 sm:grid-cols-2 sm:gap-4">
+              <p>
+                NOTE (01/14/2024): We had to delete all the accounts. Please
+                re-register (Don't worry, we're still tracking your courses!).
+                You might need to clear your browser cache if the register
+                button doesn't work.
+              </p>
+              <div className="w-2/3 grid grid-rows-2 grid-cols-1 gap-2 sm:w-80 sm:pt-8 sm:grid-cols-2 sm:gap-4 flex-shrink-0">
                 <button
                   className="h-8 inline-flex justify-center align-text-middle border-4 border-transparent shadow-sm text-md font-sans font-lg rounded-xl text-white bg-ubc-blue hover:bg-ubc-grey focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indio-500"
                   onClick={login}
