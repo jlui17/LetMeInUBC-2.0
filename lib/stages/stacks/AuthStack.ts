@@ -13,7 +13,7 @@ export class AuthStack extends Stack {
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
-    this.userPool = new UserPool(this, "MyPool", {
+    this.userPool = new UserPool(this, "users", {
       selfSignUpEnabled: true,
       signInAliases: {
         email: true,
@@ -33,7 +33,7 @@ export class AuthStack extends Stack {
     });
 
     // Create App client for authorization
-    this.userPool.addClient("app-client", {
+    this.userPool.addClient("users-pool-client", {
       oAuth: {
         flows: {
           implicitCodeGrant: true, //generates JWT
