@@ -47,7 +47,6 @@ export default function Dashboard({ token, rawToken }: DashboardProps) {
   const addCourse = async (data: CourseForm) => {
     if (!token || !rawToken) return Promise.resolve(); // should never happen
 
-    console.log(data, token, rawToken);
     const response = await fetch(
       `https://${API_GATEWAY_ID}.execute-api.us-west-2.amazonaws.com/v1/tracking`,
       {
