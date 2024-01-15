@@ -26,29 +26,18 @@ import {
 } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Token } from "../types/cognito";
 import { X } from "lucide-react";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { useState } from "react";
-
-type FormValues = {
-  session: string;
-  department: string;
-  number: string;
-  section: string;
-  email: string;
-  restricted: boolean;
-};
+import { CourseForm } from "src/types/course";
 
 type CoursesWidgetProps = {
-  token?: Token;
-  rawToken?: string;
+  addCourse?: (data: CourseForm) => Promise<void>;
   disabled?: boolean;
   setShowAddCourse?: (show: boolean) => void;
 };
 export default function CoursesWidget({
-  token,
-  rawToken,
+  addCourse,
   disabled = false,
   setShowAddCourse,
 }: CoursesWidgetProps) {
@@ -62,7 +51,7 @@ export default function CoursesWidget({
     restricted: z.boolean(),
   });
 
-  const form = useForm<FormValues>({
+  const form = useForm<CourseForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       session: "",
@@ -73,38 +62,13 @@ export default function CoursesWidget({
     },
   });
 
-  function onSubmit(data: FormValues) {
-    if (!token || !rawToken) return;
-    console.log(data, token, rawToken);
+  const onSubmit = async (data: CourseForm) => {
+    if (!addCourse) return;
     setLoading(true);
-    // const email = jwtDecode(token)["email"];
-    // console.log(jwtDecode(token), rawToken);
-
-    // const response = await fetch(
-    //   `https://${API_GATEWAY_ID}.execute-api.us-west-2.amazonaws.com/v1/tracking`,
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       Accept: "application/json",
-    //       Authorization: token,
-    //     },
-    //     body: JSON.stringify({
-    //       session: session,
-    //       department: info.department,
-    //       number: info.course_number,
-    //       section: info.section,
-    //       email: email,
-    //       restricted: restricted,
-    //     }),
-    //   }
-    // ).then((response) => {
-    //   if (response.status === 404) {
-    //     alert("Invalid Course Specified");
-    //   }
-    // });
-
-    // return 200;
-  }
+    addCourse(data).then(() => {
+      setLoading(false);
+    });
+  };
 
   return (
     <Card className="w-full min-w-[300px] max-w-md">
@@ -136,6 +100,7 @@ export default function CoursesWidget({
                           id="dept"
                           placeholder="ASIA"
                           {...field}
+                          className="uppercase"
                           disabled={disabled}
                         />
                       </FormControl>
@@ -155,6 +120,7 @@ export default function CoursesWidget({
                           id="number"
                           placeholder="320"
                           {...field}
+                          className="uppercase"
                           disabled={disabled}
                         />
                       </FormControl>
@@ -173,6 +139,7 @@ export default function CoursesWidget({
                           id="section"
                           placeholder="092"
                           {...field}
+                          className="uppercase"
                           disabled={disabled}
                         />
                       </FormControl>
@@ -199,7 +166,7 @@ export default function CoursesWidget({
                         </FormControl>
                         <SelectContent position="popper" {...field}>
                           <SelectItem value="W">Winter</SelectItem>
-                          <SelectItem value="F">Fall</SelectItem>
+                          <SelectItem value="S">Summer</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

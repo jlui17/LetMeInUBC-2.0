@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table";
 import { CourseEntry } from "src/types/course";
 import { Checkbox } from "@/components/ui/checkbox";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 type TrackingTableProps = {
   courses: CourseEntry[];
@@ -22,25 +23,6 @@ export default function TrackingTable({
   selectedCourses,
   setSelectedCourses,
 }: TrackingTableProps) {
-  // const getCourses = async () => {
-  //   const email = token.email;
-
-  //   await fetch(
-  //     `https://${API_GATEWAY_ID}.execute-api.us-west-2.amazonaws.com/v1/tracking?key=email&email=${email}`,
-  //     {
-  //       method: "GET",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: rawToken,
-  //       },
-  //     },
-  //   )
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       console.log(data);
-  //     });
-  // };
-
   const handleSelectCourse = (
     course: CourseEntry,
     checked: string | boolean,
@@ -75,7 +57,12 @@ export default function TrackingTable({
       <TableBody>
         {loading && (
           <TableRow>
-            <TableCell colSpan={5}>Loading...</TableCell>
+            <TableCell colSpan={5}>
+              <div className="flex gap-2">
+                <LoadingSpinner />
+                Loading...
+              </div>
+            </TableCell>
           </TableRow>
         )}
 
@@ -95,7 +82,9 @@ export default function TrackingTable({
               <TableCell>{course.number.S}</TableCell>
               <TableCell>{course.section.S}</TableCell>
               <TableCell>{course.session.S}</TableCell>
-              <TableCell>{course.restricted.S ? "Yes" : "No"}</TableCell>
+              <TableCell>
+                {course.restricted.S === "true" ? "Yes" : "No"}
+              </TableCell>
               <TableCell>{course.description.S}</TableCell>
             </TableRow>
           ))}

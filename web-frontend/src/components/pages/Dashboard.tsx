@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { useCallback, useEffect, useState } from "react";
 import { Token } from "src/types/cognito";
-import { CourseEntry } from "src/types/course";
+import { CourseEntry, CourseForm } from "src/types/course";
 import CoursesWidget from "../CoursesWidget";
 import DashboardLayout from "../DashboardLayout";
 import TrackingTable from "../TrackingTable";
 import { API_GATEWAY_ID } from "../../common/config";
+import { LoadingSpinner } from "../LoadingSpinner";
 
 type DashboardProps = {
   token: Token | null;
@@ -18,6 +19,7 @@ export default function Dashboard({ token, rawToken }: DashboardProps) {
     Record<string, CourseEntry>
   >({});
   const [loading, setLoading] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false);
 
   const getCourses = useCallback(async () => {
     setLoading(true);
@@ -42,6 +44,71 @@ export default function Dashboard({ token, rawToken }: DashboardProps) {
       });
   }, [token, rawToken]);
 
+  const addCourse = async (data: CourseForm) => {
+    if (!token || !rawToken) return Promise.resolve(); // should never happen
+
+    console.log(data, token, rawToken);
+    const response = await fetch(
+      `https://${API_GATEWAY_ID}.execute-api.us-west-2.amazonaws.com/v1/tracking`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: rawToken,
+        },
+        body: JSON.stringify({
+          session: data.session.toUpperCase(),
+          department: data.department.toUpperCase(),
+          number: data.number.toUpperCase(),
+          section: data.section.toUpperCase(),
+          email: token.email,
+          restricted: data.restricted ? "true" : "false",
+        }),
+      },
+    );
+    if (response.status === 404) {
+      alert("Invalid Course Specified");
+    } else if (response.status === 201) {
+      setShowAddCourse && setShowAddCourse(false);
+      getCourses();
+    }
+  };
+
+  const deleteCourses = async (
+    selectedCourses: Record<string, CourseEntry>,
+  ) => {
+    if (!token || !rawToken) return Promise.resolve(); // should never happen
+    setLoadingDelete(true);
+
+    const newState = { ...selectedCourses };
+    for (const [id, course] of Object.entries(selectedCourses)) {
+      await fetch(
+        `https://${API_GATEWAY_ID}.execute-api.us-west-2.amazonaws.com/v1/tracking`,
+        {
+          method: "DELETE",
+          headers: {
+            Accept: "application/json",
+            Authorization: rawToken,
+          },
+          body: JSON.stringify({
+            session: course.session.S,
+            department: course.department.S,
+            number: course.number.S,
+            section: course.section.S,
+            email: token.email,
+          }),
+        },
+      ).then(() => {
+        console.log("deleted course", course);
+        delete newState[id];
+      });
+    }
+
+    setSelectedCourses(newState);
+    setLoadingDelete(false);
+    getCourses();
+  };
+
   useEffect(() => {
     getCourses();
   }, [getCourses]);
@@ -54,7 +121,7 @@ export default function Dashboard({ token, rawToken }: DashboardProps) {
     <>
       {showAddCourse && (
         <div className="absolute left-0 top-0 z-10 flex h-full w-full items-center justify-center">
-          <CoursesWidget {...{ token, rawToken, setShowAddCourse }} />
+          <CoursesWidget {...{ addCourse, setShowAddCourse }} />
           <div
             className="absolute left-0 top-0 -z-10 h-full w-full bg-primary/50"
             onClick={() => setShowAddCourse(false)}
@@ -76,11 +143,9 @@ export default function Dashboard({ token, rawToken }: DashboardProps) {
             <Button
               variant="destructive"
               className="w-fit"
-              onClick={() => {
-                console.log(selectedCourses);
-              }}
+              onClick={() => deleteCourses(selectedCourses)}
             >
-              Delete
+              {loadingDelete ? <LoadingSpinner /> : "Delete"}
             </Button>
           )}
         </div>

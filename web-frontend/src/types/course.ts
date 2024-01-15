@@ -1,7 +1,15 @@
+export type CourseForm = {
+  session: string;
+  department: string;
+  number: string;
+  section: string;
+  email: string;
+  restricted: boolean;
+};
+
 type Value<T> = {
   S: T;
 };
-
 export type CourseEntry = {
   name: Value<string>;
   restricted: Value<string>;
