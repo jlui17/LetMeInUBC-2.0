@@ -11,7 +11,7 @@ export class FrontendStack extends Stack {
     //Create SPA - Cloudfront-SPA for in-built https support, deploy first to get URL
     const spa_app = new SPADeploy(this, "spaDeploy").createSiteWithCloudfront({
       indexDoc: "index.html",
-      websiteFolder: "web-frontend/build",
+      websiteFolder: "web-frontend/dist",
       certificateARN:
         "arn:aws:acm:us-east-1:572648781471:certificate/9ef5b6a6-9c1e-469e-9969-e6e080ba60df",
       cfAliases: ["www.letmeinubc.com", "letmeinubc.com"],

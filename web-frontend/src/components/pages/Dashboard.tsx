@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Token } from "src/types/cognito";
 import { CourseEntry, CourseForm } from "src/types/course";
 import CoursesWidget from "../CoursesWidget";
-import DashboardLayout from "../DashboardLayout";
+import DashboardLayout from "../AppLayout";
 import TrackingTable from "../TrackingTable";
 import { API_GATEWAY_ID } from "../../common/config";
 import { LoadingSpinner } from "../LoadingSpinner";
@@ -127,7 +127,7 @@ export default function Dashboard({ token, rawToken }: DashboardProps) {
           />
         </div>
       )}
-      <DashboardLayout activeTab="dashboard">
+      <DashboardLayout activeTab="dashboard" rawToken={rawToken}>
         <div className="text-2xl font-bold">Tracked Courses</div>
         <div className="my-3 flex flex-row gap-2">
           <Button
