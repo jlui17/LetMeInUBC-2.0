@@ -1,5 +1,5 @@
 import { Token } from "src/types/cognito";
-import DashboardLayout from "../AppLayout";
+import AppLayout from "../AppLayout";
 import { Button } from "@/components/ui/button";
 import { FORGOT_PASSWORD_URL, LOGOUT_URL } from "../../common/config";
 import { Link } from "react-router-dom";
@@ -13,7 +13,7 @@ export default function Account({ rawToken, token }: AccountProps) {
     return <div>Not logged in.</div>;
   }
   return (
-    <DashboardLayout activeTab="account" rawToken={rawToken}>
+    <AppLayout activeTab="account" rawToken={rawToken}>
       <div className="text-2xl font-bold">Account Settings</div>
       <div className="my-3 flex flex-col gap-2">
         <div className="flex justify-between">
@@ -29,6 +29,6 @@ export default function Account({ rawToken, token }: AccountProps) {
           </Button>
         </div>
       </div>
-    </DashboardLayout>
+    </AppLayout>
   );
 }

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Token } from "src/types/cognito";
 import { CourseEntry, CourseForm } from "src/types/course";
 import CoursesWidget from "../CoursesWidget";
-import DashboardLayout from "../AppLayout";
+import AppLayout from "../AppLayout";
 import TrackingTable from "../TrackingTable";
 import { API_GATEWAY_ID } from "../../common/config";
 import { LoadingSpinner } from "../LoadingSpinner";
@@ -117,9 +117,9 @@ export default function Dashboard({ token, rawToken }: DashboardProps) {
   }
 
   return (
-    <>
+    <div className="w-full">
       {showAddCourse && (
-        <div className="absolute left-0 top-0 z-10 flex h-full w-full items-center justify-center">
+        <div className="absolute left-0 top-0 z-10 flex h-screen w-screen items-center justify-center">
           <CoursesWidget {...{ addCourse, setShowAddCourse }} />
           <div
             className="absolute left-0 top-0 -z-10 h-full w-full bg-primary/50"
@@ -127,7 +127,7 @@ export default function Dashboard({ token, rawToken }: DashboardProps) {
           />
         </div>
       )}
-      <DashboardLayout activeTab="dashboard" rawToken={rawToken}>
+      <AppLayout activeTab="dashboard" rawToken={rawToken}>
         <div className="text-2xl font-bold">Tracked Courses</div>
         <div className="my-3 flex flex-row gap-2">
           <Button
@@ -151,7 +151,7 @@ export default function Dashboard({ token, rawToken }: DashboardProps) {
         <TrackingTable
           {...{ courses, loading, selectedCourses, setSelectedCourses }}
         />
-      </DashboardLayout>
-    </>
+      </AppLayout>
+    </div>
   );
 }
