@@ -9,15 +9,14 @@ phases:
     commands:
       - echo "Installing dependencies"
       - npm install
-      - cd letmeinubc-react
+      - cd web-frontend
       - npm install
   build:
     on-failure: ABORT
     commands:
-      - cd letmeinubc-react
+      - cd web-frontend
       - npm run build
   post_build:
     on-failure: ABORT
     commands:
       - npm run test
-  

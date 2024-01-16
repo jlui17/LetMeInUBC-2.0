@@ -27,7 +27,7 @@ export class LetMeInUbc20PipelineStack extends Stack {
         input: source,
         commands: [
           "npm install && npm ci && npm run build", // npm install && npm ci to fix out of sync package.json and lockfile
-          "cd letmeinubc-react && npm install && npm ci && npm run build",
+          "cd web-frontend && npm install && npm ci && npm run build",
           "cd .. && npm run test",
           "npx cdk synth",
         ],
