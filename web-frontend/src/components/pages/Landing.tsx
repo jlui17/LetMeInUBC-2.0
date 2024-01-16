@@ -12,9 +12,9 @@ export default function Account() {
       <main className="flex flex-col items-center">
         <div className="relative flex min-h-[60svh] w-full flex-col items-center justify-center gap-12 bg-primary px-4 pb-44 pt-16 md:gap-16 md:px-12 lg:flex-row lg:px-36 xl:px-[15svw]">
           <div className="flex flex-col items-center lg:items-start">
-            <div className="flex flex-col text-center text-4xl font-semibold text-primary-foreground sm:text-5xl lg:text-start lg:leading-[3.5rem]">
-              Track your course openings with LetMeInUBC.
-            </div>
+            <p className="flex flex-col text-center text-4xl font-semibold text-primary-foreground sm:text-5xl lg:text-start lg:leading-[3.5rem]">
+              Track your full course sections for openings with LetMeInUBC.
+            </p>
             <Link to={SIGNUP_URL}>
               <Button
                 variant="secondary"
