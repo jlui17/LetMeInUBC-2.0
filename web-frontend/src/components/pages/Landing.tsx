@@ -28,7 +28,7 @@ export default function Account() {
           <img
             src="/images/preview-1.png"
             alt="preview"
-            className="rounded object-contain sm:max-w-md"
+            className="rounded sm:h-96 lg:h-auto lg:max-w-[35svw]"
           />
           <div className="absolute bottom-0 h-0 w-0 border-b-[10vh] border-l-[50svw] border-r-[100svw] border-transparent border-b-white"></div>
         </div>
