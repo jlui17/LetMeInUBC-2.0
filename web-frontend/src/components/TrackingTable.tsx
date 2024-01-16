@@ -41,13 +41,13 @@ export default function TrackingTable({
   };
 
   return (
-    <Table>
+    <Table className="w-full text-nowrap">
       <TableCaption>The list of courses you are tracking</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead></TableHead>
-          <TableHead>Department</TableHead>
-          <TableHead>Code</TableHead>
+          <TableHead />
+          <TableHead>Subject</TableHead>
+          <TableHead>Number</TableHead>
           <TableHead>Section</TableHead>
           <TableHead>Session</TableHead>
           <TableHead>Include Restricted Seats</TableHead>
@@ -75,7 +75,7 @@ export default function TrackingTable({
                   onCheckedChange={(checked) =>
                     handleSelectCourse(course, checked)
                   }
-                  className="h-5 w-5"
+                  className="my-auto h-5 w-5"
                 />
               </TableCell>
               <TableCell>{course.department.S}</TableCell>

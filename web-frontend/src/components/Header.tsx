@@ -15,7 +15,10 @@ export default function Header() {
   return (
     <div className="flex flex-col justify-center bg-primary py-5 md:h-[64px] md:py-0">
       <div className="flex flex-wrap items-center justify-between gap-2 px-4 md:px-12 lg:px-36 xl:px-[15svw]">
-        <a className="text-2xl font-bold text-primary-foreground" href="/">
+        <a
+          className="text-xl font-bold text-primary-foreground lg:text-2xl"
+          href="/"
+        >
           LetMeInUBC
         </a>
         <div className="flex w-fit flex-row justify-center gap-2">

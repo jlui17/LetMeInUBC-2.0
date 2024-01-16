@@ -30,9 +30,9 @@ export default function AppLayout({
   return (
     <div className="flex h-screen w-screen overflow-hidden">
       <div className="flex w-fit flex-col bg-primary px-4 py-8 text-primary-foreground">
-        <div className="hidden pb-2 text-3xl font-bold sm:block">
+        <a className="hidden pb-2 text-3xl font-bold sm:block" href="/">
           LetMeInUBC
-        </div>
+        </a>
         {tabs.map((tab) => (
           <NavLink
             key={tab.id}
@@ -44,7 +44,13 @@ export default function AppLayout({
           </NavLink>
         ))}
       </div>
-      <div className="w-full overflow-auto p-8">{children}</div>
+      <div className="flex w-full flex-col justify-between overflow-auto p-8 pb-0">
+        <div>{children}</div>
+        <div className="py-2 text-center text-sm text-muted-foreground">
+          LetMeInUBC © {new Date().getFullYear()}. LetMeInUBC is no way
+          affiliated with the University of British Columbia.
+        </div>
+      </div>
     </div>
   );
 }

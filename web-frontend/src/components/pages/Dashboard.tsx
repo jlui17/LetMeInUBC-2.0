@@ -5,7 +5,7 @@ import { CourseEntry, CourseForm } from "src/types/course";
 import CoursesWidget from "../CoursesWidget";
 import AppLayout from "../AppLayout";
 import TrackingTable from "../TrackingTable";
-import { API_GATEWAY_ID } from "../../common/config";
+import { API_GATEWAY_ID, LOGIN_URL } from "../../common/config";
 import { LoadingSpinner } from "../LoadingSpinner";
 
 type DashboardProps = {
@@ -41,6 +41,11 @@ export default function Dashboard({ token, rawToken }: DashboardProps) {
       .then((data) => {
         setCourses(data);
         setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        setLoading(false);
+        window.location.href = LOGIN_URL;
       });
   }, [token, rawToken]);
 
